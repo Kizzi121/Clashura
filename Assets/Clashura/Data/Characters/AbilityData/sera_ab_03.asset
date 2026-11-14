@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d050e6202f5ad44b5edd6e2da0ed73, type: 3}
+  m_Name: sera_ab_03
+  m_EditorClassIdentifier: 
+  abilityId: sera_ab_03
+  abilityName: Benediction
+  icon: {fileID: -4191863003707290840, guid: 289ec838c4d0fc149925e3644bb4a0aa, type: 3}
+  description: Aura that constantly regenerates team health over time.
+  abilityType: 0
+  cooldown: 0

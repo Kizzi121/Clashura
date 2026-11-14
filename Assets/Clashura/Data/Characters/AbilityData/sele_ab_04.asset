@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d050e6202f5ad44b5edd6e2da0ed73, type: 3}
+  m_Name: sele_ab_04
+  m_EditorClassIdentifier: 
+  abilityId: sele_ab_04
+  abilityName: Lunar Eclipse
+  icon: {fileID: 1845744952358540674, guid: 3997b7b6f406c1b40908352670ba2aed, type: 3}
+  description: Blinds all enemies while replenishing team energy.
+  abilityType: 3
+  cooldown: 28

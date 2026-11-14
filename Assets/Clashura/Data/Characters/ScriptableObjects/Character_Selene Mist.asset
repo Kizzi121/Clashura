@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7c416caa521c3c499b2ead3fb1ac78e, type: 3}
+  m_Name: Character_Selene Mist
+  m_EditorClassIdentifier: 
+  characterId: clashura_char_11
+  characterName: Selene Mist
+  characterTitle: 'The Lunar Kitsune [Celestial Nine-Tails]'
+  role: 5
+  portrait: {fileID: 21300000, guid: 76c29cf0e22ca5b4d84ec39a150c73d8, type: 3}
+  selectionArtwork: {fileID: 21300000, guid: 71e6d0ec8d90a5840b0f7dfd95a2af3d, type: 3}
+  characterSprite: {fileID: 21300000, guid: 7f59cb3c95aa8f847aac9f5c5c85e399, type: 3}
+  characterPrefab2D: {fileID: 5341540184274265731, guid: f84aa145d2700294cb34c9c4a781af80, type: 3}
+  spriteSheetFrames: []
+  bio: A mysterious fox spirit maiden in indigo robes with pointed ears and majestic
+    tails, wielding spirit fire.
+  baseStats:
+    maxHealth: 980
+    attack: 85
+    defense: 90
+    speed: 60
+  abilities:
+  - {fileID: 11400000, guid: 17c909c867390174d8b0b1890a353833, type: 2}
+  - {fileID: 11400000, guid: 90fa00b50e8afdb499c6c9ae3892112b, type: 2}
+  - {fileID: 11400000, guid: 1b72af7a13d490e41b0ee5cda589d92e, type: 2}
+  - {fileID: 11400000, guid: 270f5d83377cf6c4ba656c5768da43b0, type: 2}

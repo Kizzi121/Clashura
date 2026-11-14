@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d050e6202f5ad44b5edd6e2da0ed73, type: 3}
+  m_Name: jin_ab_03
+  m_EditorClassIdentifier: 
+  abilityId: jin_ab_03
+  abilityName: Flowing Blade
+  icon: {fileID: -9200238577106214438, guid: 141261e49d90aed41b2e633a9996aa82, type: 3}
+  description: Landing attacks increases attack speed incrementally.
+  abilityType: 0
+  cooldown: 0

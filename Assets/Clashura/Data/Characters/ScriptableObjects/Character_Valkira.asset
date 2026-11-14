@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7c416caa521c3c499b2ead3fb1ac78e, type: 3}
+  m_Name: Character_Valkira
+  m_EditorClassIdentifier: 
+  characterId: clashura_char_02
+  characterName: Valkira
+  characterTitle: 'The Lupine Corsair [Dire Wolf Vanguard]'
+  role: 1
+  portrait: {fileID: 21300000, guid: 9c2314fcfb7deae4ea33667770e2975c, type: 3}
+  selectionArtwork: {fileID: 21300000, guid: 690d33726e19b91478cf933e3c3a76fd, type: 3}
+  characterSprite: {fileID: 21300000, guid: 7fb25654c9ec8104f81c117ea85f76bc, type: 3}
+  characterPrefab2D: {fileID: 1229666938713907955, guid: f9d0356c35d2e5844a53786a4791e61d, type: 3}
+  spriteSheetFrames: []
+  bio: A towering anthropomorphic grey wolf warrior clad in a fur-collared pirate
+    coat and dark leather armor.
+  baseStats:
+    maxHealth: 1100
+    attack: 210
+    defense: 90
+    speed: 70
+  abilities:
+  - {fileID: 11400000, guid: 768a6680a0b48cb41a798d748f61715e, type: 2}
+  - {fileID: 11400000, guid: 6d9bb9fb3d2fb504c9eaf327b6dd7ab5, type: 2}
+  - {fileID: 11400000, guid: 9b21c06bb8aefa44689daf4f3214b650, type: 2}
+  - {fileID: 11400000, guid: be9eb3663b501b843a117668ac69fff8, type: 2}

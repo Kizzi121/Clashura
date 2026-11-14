@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d050e6202f5ad44b5edd6e2da0ed73, type: 3}
+  m_Name: Ability_jin_ab_04
+  m_EditorClassIdentifier: 
+  abilityId: jin_ab_04
+  abilityName: Cherry Blossom Tempest
+  icon: {fileID: 129969635357040083, guid: 5dd95bed619776349ade0176d80dada6, type: 3}
+  description: Blinks between targets delivering twelve lethal strikes.
+  abilityType: 3
+  cooldown: 22

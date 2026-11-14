@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7c416caa521c3c499b2ead3fb1ac78e, type: 3}
+  m_Name: Character_Gorgar
+  m_EditorClassIdentifier: 
+  characterId: clashura_char_12
+  characterName: Gorgar
+  characterTitle: 'The Draconic Berserker [Dragonkin Warrior]'
+  role: 0
+  portrait: {fileID: 21300000, guid: de6da72bebae5a24d8acd7b1e3cc1bce, type: 3}
+  selectionArtwork: {fileID: 21300000, guid: 1fe2d9d05d856b54495b96227b73d9d0, type: 3}
+  characterSprite: {fileID: 21300000, guid: 7699472ddf12f2547b0f85a637abd3bc, type: 3}
+  characterPrefab2D: {fileID: 8806531601818338667, guid: 2753d48149ae7b240a37f3d35c3596ca, type: 3}
+  spriteSheetFrames: []
+  bio: A fearsome crimson-scaled reptilian warrior with a jagged horn, muscular build,
+    and scorched bronze mail.
+  baseStats:
+    maxHealth: 1900
+    attack: 110
+    defense: 205
+    speed: 28
+  abilities:
+  - {fileID: 11400000, guid: 7ed7d7f2762d5524bbbf2b87282af25e, type: 2}
+  - {fileID: 11400000, guid: 393af4f640a8acd40b1d07cc59f28f92, type: 2}
+  - {fileID: 11400000, guid: 8e7952f0a9dfb8845824063a23fedcf1, type: 2}
+  - {fileID: 11400000, guid: 395c3d09b8386ed439bbd893a85ba102, type: 2}

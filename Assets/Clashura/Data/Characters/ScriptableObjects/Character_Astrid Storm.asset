@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7c416caa521c3c499b2ead3fb1ac78e, type: 3}
+  m_Name: Character_Astrid Storm
+  m_EditorClassIdentifier: 
+  characterId: clashura_char_13
+  characterName: Astrid Storm
+  characterTitle: 'The Cyber Neko [Neon Android Striker]'
+  role: 1
+  portrait: {fileID: 21300000, guid: 1a7d11a10b8c73a4d9ed08f9ad361476, type: 3}
+  selectionArtwork: {fileID: 21300000, guid: 42b0a73662c16af4f96b7a244b0725fe, type: 3}
+  characterSprite: {fileID: 21300000, guid: f92f4843bccf5ae49a1f563a4fdaf6ae, type: 3}
+  characterPrefab2D: {fileID: 10377137556705718, guid: c096040fdc5dc674ab0e9ea9ebd8ca73, type: 3}
+  spriteSheetFrames: []
+  bio: A high-speed cybernetic android girl in a black and neon-pink armored bodysuit
+    with digital cat ears.
+  baseStats:
+    maxHealth: 1100
+    attack: 200
+    defense: 85
+    speed: 85
+  abilities:
+  - {fileID: 11400000, guid: 947f3f9c76199d94b86e6586abc131db, type: 2}
+  - {fileID: 11400000, guid: 4bc969f344e6ca64987784ab3673a706, type: 2}
+  - {fileID: 11400000, guid: 171536b36fc2b354499f9287136d64e7, type: 2}
+  - {fileID: 11400000, guid: 07b9dacd943a05747a83e6e6923f6f8c, type: 2}

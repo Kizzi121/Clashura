@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d050e6202f5ad44b5edd6e2da0ed73, type: 3}
+  m_Name: Ability_dari_ab_02
+  m_EditorClassIdentifier: 
+  abilityId: dari_ab_02
+  abilityName: Hex of Fragility
+  icon: {fileID: 6243481195782462416, guid: 8e1dc143f3189f84d880e782ceb43a6b, type: 3}
+  description: Places a blood curse weakening target defense significantly.
+  abilityType: 2
+  cooldown: 8

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7c416caa521c3c499b2ead3fb1ac78e, type: 3}
+  m_Name: Character_Seraphina
+  m_EditorClassIdentifier: 
+  characterId: clashura_char_08
+  characterName: Seraphina
+  characterTitle: 'The Emerald Dervish [Agile Martial Rogue]'
+  role: 5
+  portrait: {fileID: 21300000, guid: ca490c1de1052914e8ec690eb1aa675a, type: 3}
+  selectionArtwork: {fileID: 21300000, guid: fdad60c79c86cd040975b7fb9287ad65, type: 3}
+  characterSprite: {fileID: 21300000, guid: 9446e4daa79a6d24babb2f2aac0a69f4, type: 3}
+  characterPrefab2D: {fileID: 7217605866734798701, guid: 624527b90babd5c459257b2e8c211103, type: 3}
+  spriteSheetFrames: []
+  bio: A ponytail-sporting green martial artist with agile footwork, razor-sharp
+    kicks, and dual wrist blades.
+  baseStats:
+    maxHealth: 950
+    attack: 80
+    defense: 95
+    speed: 50
+  abilities:
+  - {fileID: 11400000, guid: 47a4490651f9090499ac7d17b6c97505, type: 2}
+  - {fileID: 11400000, guid: a3d3202fcf4362e4fab4847a9c487c9c, type: 2}
+  - {fileID: 11400000, guid: 7d98e71fb727f6e4793bbed6fa3860fa, type: 2}
+  - {fileID: 11400000, guid: 2cce223f7899ea745b9b0ac2e9f7f408, type: 2}

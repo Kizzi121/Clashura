@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7c416caa521c3c499b2ead3fb1ac78e, type: 3}
+  m_Name: Character_Morvath
+  m_EditorClassIdentifier: 
+  characterId: clashura_char_09
+  characterName: Morvath
+  characterTitle: 'The Hex Alchemist [Steampunk Artificer]'
+  role: 3
+  portrait: {fileID: 21300000, guid: 07d8c70d8cb5be54ca3a9ba0dda0463c, type: 3}
+  selectionArtwork: {fileID: 21300000, guid: bbb04fc1c52185d449c3f24869d58c2f, type: 3}
+  characterSprite: {fileID: 21300000, guid: c4e3c223fd8733b45a5233cf3550c50e, type: 3}
+  characterPrefab2D: {fileID: 6218228650851972441, guid: a8124d6916b06be408431f6f038eac59, type: 3}
+  spriteSheetFrames: []
+  bio: A brilliant steampunk scholar with brass goggles and potion bandolier, throwing
+    explosive alchemical flasks.
+  baseStats:
+    maxHealth: 1350
+    attack: 140
+    defense: 110
+    speed: 45
+  abilities:
+  - {fileID: 11400000, guid: 1b78352ee2a55eb43952202b117afda1, type: 2}
+  - {fileID: 11400000, guid: 36aa96885be89954a8d026d924d34a73, type: 2}
+  - {fileID: 11400000, guid: ba066493e69505c4d8ddc437e135ca66, type: 2}
+  - {fileID: 11400000, guid: f8f76cdae66ceff47ae1aed0ea71b333, type: 2}

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7c416caa521c3c499b2ead3fb1ac78e, type: 3}
+  m_Name: Character_Ronin Jin
+  m_EditorClassIdentifier: 
+  characterId: clashura_char_15
+  characterName: Ronin Jin
+  characterTitle: 'The Wandering Monk [Bare-Knuckle Asura]'
+  role: 2
+  portrait: {fileID: 21300000, guid: dd8daa3eac2453c4db65826cfe9596a8, type: 3}
+  selectionArtwork: {fileID: 21300000, guid: 429f71a965d61f749bf996a94c8a3d58, type: 3}
+  characterSprite: {fileID: 21300000, guid: 5873767509a8f9c4aaab6dc1defc190a, type: 3}
+  characterPrefab2D: {fileID: 2848793297146417151, guid: a0503a451dc764445a992f6a97645179, type: 3}
+  spriteSheetFrames: []
+  bio: A battle-hardened bare-chested brawler with giant prayer beads and martial
+    wraps, fighting for honor.
+  baseStats:
+    maxHealth: 1050
+    attack: 205
+    defense: 80
+    speed: 90
+  abilities:
+  - {fileID: 11400000, guid: 687d0a7b3f265d849a0edb07fd93ff19, type: 2}
+  - {fileID: 11400000, guid: ed9c81fbd4d26ef47924846fdaac3ff7, type: 2}
+  - {fileID: 11400000, guid: 81934caddca78f943b502c833765d318, type: 2}
+  - {fileID: 11400000, guid: d8c554bd1a962774e883b30e2ed04f8a, type: 2}

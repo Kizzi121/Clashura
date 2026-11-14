@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7c416caa521c3c499b2ead3fb1ac78e, type: 3}
+  m_Name: Character_Darius Hex
+  m_EditorClassIdentifier: 
+  characterId: clashura_char_14
+  characterName: Darius Hex
+  characterTitle: 'The Molten Dreadnought [Hellfire Dark Knight]'
+  role: 3
+  portrait: {fileID: 21300000, guid: 2dd9935ecf3eb4d4eb88408ac90614aa, type: 3}
+  selectionArtwork: {fileID: 21300000, guid: e95352a87677f3e48a3cc0e98a2260a5, type: 3}
+  characterSprite: {fileID: 21300000, guid: 68d3b9bafb55b024fae51f78e32f6e46, type: 3}
+  characterPrefab2D: {fileID: 2878447473173804077, guid: 1e67a7ef83ab87a49ba80e27a00a92da, type: 3}
+  spriteSheetFrames: []
+  bio: A dark warrior encased in charred black armor pulsing with molten lava cracks
+    and glowing red eyes.
+  baseStats:
+    maxHealth: 1200
+    attack: 165
+    defense: 95
+    speed: 55
+  abilities:
+  - {fileID: 11400000, guid: 79e435343e50325499ebad26a465cbda, type: 2}
+  - {fileID: 11400000, guid: e39506af1748a8540bfb17412e548dfa, type: 2}
+  - {fileID: 11400000, guid: 5637115181dadcb41b36c3700cec4ea6, type: 2}
+  - {fileID: 11400000, guid: 0f5deb77bfdb2eb468574c571f158e42, type: 2}

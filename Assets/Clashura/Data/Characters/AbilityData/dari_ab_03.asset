@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d050e6202f5ad44b5edd6e2da0ed73, type: 3}
+  m_Name: dari_ab_03
+  m_EditorClassIdentifier: 
+  abilityId: dari_ab_03
+  abilityName: Sanguine Hunger
+  icon: {fileID: 2270950930615634977, guid: 819bc051d8e699f41bc48e95f6bef1ca, type: 3}
+  description: Gains 25% movement speed when pursuing wounded foes.
+  abilityType: 0
+  cooldown: 0

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d050e6202f5ad44b5edd6e2da0ed73, type: 3}
+  m_Name: Ability_valk_ab_03
+  m_EditorClassIdentifier: 
+  abilityId: valk_ab_03
+  abilityName: Berserk Fury
+  icon: {fileID: -6802215304157912445, guid: 8581d2b4655939d40ae266d47f5318fd, type: 3}
+  description: Grants escalating attack power as health diminishes.
+  abilityType: 0
+  cooldown: 0
