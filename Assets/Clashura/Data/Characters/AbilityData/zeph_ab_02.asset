@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: zeph_ab_02
   abilityName: Tailwind Evade
-  icon: {fileID: -7359630609348507979, guid: 2d970d89ce549994284624c1b443649f, type: 3}
+  icon: {fileID: 21300000, guid: 7a55e9063c5a9124888ae6d3cd3615f9, type: 3}
   description: Dashes backward leaving behind a disorienting cyclone.
   abilityType: 2
   cooldown: 5

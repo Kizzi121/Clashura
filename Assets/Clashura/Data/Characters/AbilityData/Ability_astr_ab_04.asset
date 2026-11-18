@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: astr_ab_04
   abilityName: Cataclysmic Storm
-  icon: {fileID: -7249061474273122448, guid: 1375873a3522c854994f4fad26bfb271, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Summons a torrential thunderstorm striking lightning everywhere.
   abilityType: 3
   cooldown: 24

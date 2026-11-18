@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: orion_ab_03
   abilityName: Solar Armor
-  icon: {fileID: 5691309575047835282, guid: 52b2b057e097c9e40ae011346e6f7d3e, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Damaging Orion causes blinding flashes reducing enemy accuracy.
   abilityType: 0
   cooldown: 0

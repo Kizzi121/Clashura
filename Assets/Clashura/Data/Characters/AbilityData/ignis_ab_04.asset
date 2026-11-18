@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: ignis_ab_04
   abilityName: Infernal Awakening
-  icon: {fileID: 7508928777706427719, guid: b9ae8c986f4bd4e4cafdae5435ef66fa, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Supercharges sword unleashing waves of molten fire.
   abilityType: 3
   cooldown: 22

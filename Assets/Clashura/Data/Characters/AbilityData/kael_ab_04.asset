@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: kael_ab_04
   abilityName: Astral Convergence
-  icon: {fileID: -7038090919790181050, guid: 64eea761f098c594f88ead2deca874ee, type: 3}
+  icon: {fileID: 21300000, guid: 34b30803cb7929d41b7da09f8fbbb1d4, type: 3}
   description: Summons a constellation of blades homing on enemies.
   abilityType: 3
   cooldown: 20

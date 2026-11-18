@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: orion_ab_04
   abilityName: Supernova Shock
-  icon: {fileID: -2456044737408850879, guid: af52684f6b4598f42b2c608d24eb35f1, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Channels stellar collapse unleashing a massive stunning explosion.
   abilityType: 3
   cooldown: 28

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: dari_ab_01
   abilityName: Life Siphon
-  icon: {fileID: -9175353203477840922, guid: d8bdcfe9bf3de0f4f9ad46d98a9d3a26, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Channels a dark beam draining target health directly.
   abilityType: 1
   cooldown: 2.5

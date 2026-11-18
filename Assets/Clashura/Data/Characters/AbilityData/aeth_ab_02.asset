@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: aeth_ab_02
   abilityName: Aegis Strike
-  icon: {fileID: -8834672247024980726, guid: e34724dd4d398c04a84fb3982e29a1bf, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Shield bash that stuns all foes directly in front.
   abilityType: 1
   cooldown: 3

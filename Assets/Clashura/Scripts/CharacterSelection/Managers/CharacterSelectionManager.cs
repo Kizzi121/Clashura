@@ -144,6 +144,7 @@ namespace Clashura.CharacterSelection.Managers
             }
 
             _selectedCharacterIds.Add(characterId);
+            SaveCurrentSelections();
             BroadcastSelections();
             return true;
         }
@@ -155,6 +156,7 @@ namespace Clashura.CharacterSelection.Managers
             bool removed = _selectedCharacterIds.Remove(characterId);
             if (removed)
             {
+                SaveCurrentSelections();
                 BroadcastSelections();
             }
             return removed;
@@ -164,6 +166,7 @@ namespace Clashura.CharacterSelection.Managers
         {
             if (slotIndex < 0 || slotIndex >= _selectedCharacterIds.Count) return false;
             _selectedCharacterIds.RemoveAt(slotIndex);
+            SaveCurrentSelections();
             BroadcastSelections();
             return true;
         }
@@ -171,6 +174,7 @@ namespace Clashura.CharacterSelection.Managers
         public void ClearSelections()
         {
             _selectedCharacterIds.Clear();
+            SaveCurrentSelections();
             BroadcastSelections();
         }
 

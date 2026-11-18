@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: kael_ab_03
   abilityName: Mana Blade
-  icon: {fileID: -2548316491269319260, guid: e31a5e2172f2fba4bb63111fd2361fde, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Attacks consume excess energy to deal amplified bonus magic.
   abilityType: 0
   cooldown: 0

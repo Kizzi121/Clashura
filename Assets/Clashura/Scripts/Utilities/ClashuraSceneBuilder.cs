@@ -220,6 +220,10 @@ namespace Clashura.Utilities
 
             uiSO.FindProperty("visual2DController").objectReferenceValue = visualCtrl;
 
+            // --- BACK BUTTON (Top-Left) ---
+            GameObject backBtnObj = CreateButton("BackButton", parent, "← BACK", new Vector2(0.02f, 0.90f), new Vector2(0.12f, 0.96f), 20, new Color(0.95f, 0.80f, 0.35f), new Color(0.12f, 0.16f, 0.24f, 0.9f));
+            uiSO.FindProperty("backButton").objectReferenceValue = backBtnObj.GetComponent<Button>();
+
             // --- NAVIGATION BUTTONS (Left / Right) with Large High-Contrast Arrows ---
             GameObject prevBtnObj = CreateButton("PrevButton", parent, "<", new Vector2(0.22f, 0.50f), new Vector2(0.29f, 0.64f), 48, Color.white, new Color(0.16f, 0.22f, 0.32f, 0.95f));
             uiSO.FindProperty("prevButton").objectReferenceValue = prevBtnObj.GetComponent<Button>();

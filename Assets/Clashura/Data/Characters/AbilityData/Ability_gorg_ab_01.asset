@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: gorg_ab_01
   abilityName: Boulder Throw
-  icon: {fileID: 7029403135870279221, guid: 4cb9f32492095ba4ebeb70dd33f71b44, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Lobs a gigantic boulder knocking targets flat.
   abilityType: 1
   cooldown: 3.5

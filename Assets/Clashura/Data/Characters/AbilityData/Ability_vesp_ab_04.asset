@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: vesp_ab_04
   abilityName: Phantom Mirage
-  icon: {fileID: -5034272312407672484, guid: 8a0d5d008a62da24d9c288a77d96e28c, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Creates 3 shadow clones that converge and assassinate the target.
   abilityType: 3
   cooldown: 20

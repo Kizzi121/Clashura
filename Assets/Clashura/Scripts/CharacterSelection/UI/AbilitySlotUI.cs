@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Clashura.Characters.Data;
+using Clashura.Core;
 
 namespace Clashura.CharacterSelection.UI
 {
@@ -36,11 +37,36 @@ namespace Clashura.CharacterSelection.UI
             if (typeText != null)
             {
                 typeText.text = ability.AbilityType.ToString().ToUpper();
+                switch (ability.AbilityType)
+                {
+                    case AbilityType.Primary:
+                        typeText.color = new Color(1.0f, 0.70f, 0.25f); // Amber
+                        break;
+                    case AbilityType.Skill:
+                        typeText.color = new Color(0.35f, 0.75f, 1.0f); // Azure Blue
+                        break;
+                    case AbilityType.Passive:
+                        typeText.color = new Color(0.98f, 0.85f, 0.30f); // Golden Sun
+                        break;
+                    case AbilityType.Ultimate:
+                        typeText.color = new Color(1.0f, 0.35f, 0.35f); // Crimson
+                        break;
+                }
             }
 
             if (cooldownText != null)
             {
-                cooldownText.text = ability.Cooldown > 0f ? $"{ability.Cooldown:0.#}s CD" : "PASSIVE";
+                if (ability.Cooldown > 0f)
+                {
+                    cooldownText.gameObject.SetActive(true);
+                    cooldownText.text = $"{ability.Cooldown:0.#}s CD";
+                    cooldownText.color = new Color(1.0f, 0.85f, 0.30f);
+                }
+                else
+                {
+                    cooldownText.gameObject.SetActive(false);
+                    cooldownText.text = "";
+                }
             }
 
             if (descriptionText != null)

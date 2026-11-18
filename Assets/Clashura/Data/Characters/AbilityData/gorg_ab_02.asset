@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: gorg_ab_02
   abilityName: Granite Skin
-  icon: {fileID: -8187018269019133007, guid: efb57c1f83ef1214ebbf98ea93cad2b4, type: 3}
+  icon: {fileID: 21300000, guid: 7a55e9063c5a9124888ae6d3cd3615f9, type: 3}
   description: Hardens skin into solid stone temporarily doubling defense.
   abilityType: 2
   cooldown: 10

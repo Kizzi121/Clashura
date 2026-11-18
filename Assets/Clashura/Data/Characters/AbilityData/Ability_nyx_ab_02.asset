@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: nyx_ab_02
   abilityName: Void Tether
-  icon: {fileID: -2820513898291307067, guid: 4e771bba92551d54fa433a75fd191f72, type: 3}
+  icon: {fileID: 21300000, guid: 155d1b9ef6ec3a34195d9eaced9d8f44, type: 3}
   description: Roots enemies with creeping shadow tendrils.
   abilityType: 2
   cooldown: 7

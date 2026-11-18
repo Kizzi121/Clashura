@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: tahl_ab_04
   abilityName: Deep Freeze
-  icon: {fileID: 1069105566526651617, guid: 3fd43968796d1724b8d9eab958b82a87, type: 3}
+  icon: {fileID: 21300000, guid: 480e0452807c0bd4896d2afeaa4ae8cd, type: 3}
   description: Submerges the area in subzero temperatures freezing foes.
   abilityType: 3
   cooldown: 26

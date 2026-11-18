@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: lyra_ab_04
   abilityName: Storm of Brambles
-  icon: {fileID: -1614967084173673254, guid: b7fc3bf4e0698e441875aebc2d175cf8, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Showers the arena in a hail of enchanted piercing arrows.
   abilityType: 3
   cooldown: 22

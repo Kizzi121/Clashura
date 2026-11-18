@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: tahl_ab_03
   abilityName: Chilled Domain
-  icon: {fileID: -5251432242874854584, guid: 9d57e7b3688622f4fbfb4891ee9cd39b, type: 3}
+  icon: {fileID: 21300000, guid: 480e0452807c0bd4896d2afeaa4ae8cd, type: 3}
   description: Enemies in close proximity suffer progressive frostbite.
   abilityType: 0
   cooldown: 0

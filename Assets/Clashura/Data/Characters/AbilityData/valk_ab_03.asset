@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: valk_ab_03
   abilityName: Berserk Fury
-  icon: {fileID: -6802215304157912445, guid: 8581d2b4655939d40ae266d47f5318fd, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Grants escalating attack power as health diminishes.
   abilityType: 0
   cooldown: 0

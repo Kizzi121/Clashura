@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: sera_ab_03
   abilityName: Seraphic Grace
-  icon: {fileID: -4191863003707290840, guid: 289ec838c4d0fc149925e3644bb4a0aa, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Increases team movement speed and passive health regen.
   abilityType: 0
   cooldown: 0

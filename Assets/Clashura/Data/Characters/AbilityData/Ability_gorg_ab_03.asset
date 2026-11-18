@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: gorg_ab_03
   abilityName: Bedrock Core
-  icon: {fileID: 4564524686919594796, guid: bab795f8f54b549478c296cc54fde70c, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Greatly reduces incoming physical damage.
   abilityType: 0
   cooldown: 0

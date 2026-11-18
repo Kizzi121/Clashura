@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: lyra_ab_01
   abilityName: Piercing Volley
-  icon: {fileID: 8379084462923974148, guid: ca25251715e9cd743ba0d41e3917d2cf, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Fires a rapid volley of arrows piercing enemy lines.
   abilityType: 1
   cooldown: 2.5

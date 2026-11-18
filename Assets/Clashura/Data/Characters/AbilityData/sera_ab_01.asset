@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: sera_ab_01
   abilityName: Sacred Ray
-  icon: {fileID: -6761735116091880310, guid: 055c4e09caffe974fbfbb05648005b01, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Channels a beam that heals allies while searing foes.
   abilityType: 1
   cooldown: 2.5

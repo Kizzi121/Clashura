@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: gorg_ab_04
   abilityName: Avalanche Rampage
-  icon: {fileID: -8395595221524382675, guid: a910dba8eb717f848b16add407d7aa0b, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Transforms into a rolling boulder crushing enemy formations.
   abilityType: 3
   cooldown: 28

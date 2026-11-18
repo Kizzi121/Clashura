@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: brak_ab_03
   abilityName: Stone Plating
-  icon: {fileID: -9091265698527439371, guid: e5d62f33bdd73764ea167314037a15ea, type: 3}
+  icon: {fileID: 21300000, guid: 7a55e9063c5a9124888ae6d3cd3615f9, type: 3}
   description: Gains temporary bonus armor whenever taking sustained hits.
   abilityType: 0
   cooldown: 0

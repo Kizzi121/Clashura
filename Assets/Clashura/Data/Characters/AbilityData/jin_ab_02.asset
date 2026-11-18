@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: jin_ab_02
   abilityName: Parry & Counter
-  icon: {fileID: 3093104474540418938, guid: d1171b1e17fa50140833b6690cae313a, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Deflects incoming frontal attacks with a riposte strike.
   abilityType: 2
   cooldown: 5

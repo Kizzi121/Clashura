@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: tahl_ab_01
   abilityName: Frost Lance
-  icon: {fileID: -7353031204418822549, guid: df7c7688f65d85e4db919ac67e5e9390, type: 3}
+  icon: {fileID: 21300000, guid: 480e0452807c0bd4896d2afeaa4ae8cd, type: 3}
   description: Throws an icicle slowing target attack and move speed.
   abilityType: 1
   cooldown: 2.5

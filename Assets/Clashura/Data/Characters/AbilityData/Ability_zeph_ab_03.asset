@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: zeph_ab_03
   abilityName: Featherfoot
-  icon: {fileID: 1266169136611628799, guid: 8bca4278eae842b4491525e6594a4cc8, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Grants increased evasion while maintaining continuous movement.
   abilityType: 0
   cooldown: 0

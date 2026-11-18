@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: astr_ab_01
   abilityName: Lightning Arc
-  icon: {fileID: 1661560810157403908, guid: 99e7215ddacccb84bb1c15c58d137f08, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Discharges lightning bolts that jump between nearby foes.
   abilityType: 1
   cooldown: 2

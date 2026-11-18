@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: vesp_ab_03
   abilityName: Veil of Shadows
-  icon: {fileID: -1123821733688690963, guid: dd80f13816744c94788e9843174fc27e, type: 3}
+  icon: {fileID: 21300000, guid: 155d1b9ef6ec3a34195d9eaced9d8f44, type: 3}
   description: Becomes completely invisible for 2.5 seconds on each kill.
   abilityType: 0
   cooldown: 0

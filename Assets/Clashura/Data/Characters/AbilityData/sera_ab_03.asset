@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: sera_ab_03
   abilityName: Benediction
-  icon: {fileID: -4191863003707290840, guid: 289ec838c4d0fc149925e3644bb4a0aa, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Aura that constantly regenerates team health over time.
   abilityType: 0
   cooldown: 0

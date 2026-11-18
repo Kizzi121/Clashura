@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: sele_ab_01
   abilityName: Moonlight Spark
-  icon: {fileID: -8966385303277531442, guid: 9ec86c560aeb94145abb540914e07d21, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Discharges orbs of lunar magic soothing allies.
   abilityType: 1
   cooldown: 2

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: orion_ab_01
   abilityName: Stellar Pulse
-  icon: {fileID: -1879557428949239366, guid: 051067e1fa6070f47b23d90eeead08d4, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Pulses concentrated cosmic radiation in front.
   abilityType: 1
   cooldown: 3

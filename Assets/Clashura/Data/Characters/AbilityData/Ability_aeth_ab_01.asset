@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: aeth_ab_01
   abilityName: Dawn's Bastion
-  icon: {fileID: -1422127290740765099, guid: 423759ca8b213d6458b3d9dba69908ef, type: 3}
+  icon: {fileID: 21300000, guid: 7a55e9063c5a9124888ae6d3cd3615f9, type: 3}
   description: Erects a golden aegis absorbing massive damage.
   abilityType: 2
   cooldown: 8

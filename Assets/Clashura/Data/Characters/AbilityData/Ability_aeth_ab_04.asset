@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: aeth_ab_04
   abilityName: Wrath of the Sun
-  icon: {fileID: -8179548818013191020, guid: f70a8182bced56648bf9c5a8e7720139, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Unleashes an incandescent shockwave across the field.
   abilityType: 3
   cooldown: 25

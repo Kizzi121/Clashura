@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: dari_ab_03
   abilityName: Sanguine Hunger
-  icon: {fileID: 2270950930615634977, guid: 819bc051d8e699f41bc48e95f6bef1ca, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Gains 25% movement speed when pursuing wounded foes.
   abilityType: 0
   cooldown: 0

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: sele_ab_04
   abilityName: Eclipse Tranquility
-  icon: {fileID: 1845744952358540674, guid: 3997b7b6f406c1b40908352670ba2aed, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Puts enemies in range to sleep and grants immunity to allies.
   abilityType: 3
   cooldown: 30

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: orion_ab_02
   abilityName: Gravitational Well
-  icon: {fileID: -2916457366368550579, guid: 559145e7dff4f524f99f58dae155b936, type: 3}
+  icon: {fileID: 21300000, guid: 7a55e9063c5a9124888ae6d3cd3615f9, type: 3}
   description: Deploys an anchor pulling enemy projectiles into the void.
   abilityType: 2
   cooldown: 8

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: nyx_ab_03
   abilityName: Soul Harvest
-  icon: {fileID: -4761771597254116802, guid: 8091ca968244ad846a8c23204f694adb, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Restores health whenever a nearby enemy takes heavy damage.
   abilityType: 0
   cooldown: 0

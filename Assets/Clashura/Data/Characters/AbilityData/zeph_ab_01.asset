@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: zeph_ab_01
   abilityName: Gale Thrust
-  icon: {fileID: -3594817719845714009, guid: 9c1a3167ba765ac4594e490ce515dda0, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Pierces defenses with aerodynamic wind-infused stabs.
   abilityType: 1
   cooldown: 2

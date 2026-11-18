@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: ignis_ab_03
   abilityName: Ignition
-  icon: {fileID: 1784947663942585843, guid: bb2e4d4eb821d9742b25f738e7fea7c1, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Normal attacks leave burning embers dealing dot.
   abilityType: 0
   cooldown: 0

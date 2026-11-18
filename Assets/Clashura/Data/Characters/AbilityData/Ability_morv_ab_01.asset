@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: morv_ab_01
   abilityName: Corrosive Flask
-  icon: {fileID: -6239451850651395934, guid: 66fbfe17f25c7aa469364c31e341459b, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Hurls corrosive chemicals corroding target defenses.
   abilityType: 1
   cooldown: 3

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: astr_ab_03
   abilityName: Static Buildup
-  icon: {fileID: 4440963114274639122, guid: 15370a126f12e12499cc47a602b2c666, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Every 4th attack delivers an instant critical lightning strike.
   abilityType: 0
   cooldown: 0

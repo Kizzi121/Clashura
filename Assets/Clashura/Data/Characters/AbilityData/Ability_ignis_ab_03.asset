@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: ignis_ab_03
   abilityName: Fire Within
-  icon: {fileID: 1784947663942585843, guid: bb2e4d4eb821d9742b25f738e7fea7c1, type: 3}
+  icon: {fileID: 21300000, guid: c431831de8de75945aa2dfccb67f4ef9, type: 3}
   description: Basic attacks apply burning damage over 3 seconds.
   abilityType: 0
   cooldown: 0

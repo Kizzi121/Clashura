@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: dari_ab_04
   abilityName: Crimson Harvest
-  icon: {fileID: 2380361326493766297, guid: 3531f922b9712f64180f47a20584176e, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Drains life simultaneously from all enemies in proximity.
   abilityType: 3
   cooldown: 26

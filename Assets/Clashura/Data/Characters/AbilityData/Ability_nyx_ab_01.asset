@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: nyx_ab_01
   abilityName: Umbral Orb
-  icon: {fileID: 5694417695777114955, guid: 1895a04fa20f6924cb39382b278ea3e4, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Hurls an orb of concentrated dark energy that homes in.
   abilityType: 1
   cooldown: 3

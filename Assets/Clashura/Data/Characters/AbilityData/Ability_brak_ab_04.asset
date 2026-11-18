@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: brak_ab_04
   abilityName: Seismic Catastrophe
-  icon: {fileID: -8839368477612225904, guid: 449b9e34b5310c345a230eb479c21a9a, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Shatters surrounding terrain creating impassable barriers.
   abilityType: 3
   cooldown: 30

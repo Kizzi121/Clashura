@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: jin_ab_04
   abilityName: Cherry Blossom Tempest
-  icon: {fileID: 129969635357040083, guid: 5dd95bed619776349ade0176d80dada6, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Blinks between targets delivering twelve lethal strikes.
   abilityType: 3
   cooldown: 22

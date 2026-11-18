@@ -58,7 +58,7 @@ namespace Clashura.CharacterSelection.UI
                 if (filledStateRoot != null) filledStateRoot.SetActive(false);
                 if (emptyStateRoot != null) emptyStateRoot.SetActive(true);
                 if (portraitImage != null) portraitImage.enabled = false;
-                if (nameText != null) nameText.text = "Empty Slot";
+                if (nameText != null) nameText.text = "EMPTY";
                 if (roleText != null) roleText.text = string.Empty;
                 return;
             }

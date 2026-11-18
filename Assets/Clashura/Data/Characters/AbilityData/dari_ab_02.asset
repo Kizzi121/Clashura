@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: dari_ab_02
   abilityName: Hex of Fragility
-  icon: {fileID: 6243481195782462416, guid: 8e1dc143f3189f84d880e782ceb43a6b, type: 3}
+  icon: {fileID: 21300000, guid: 34b30803cb7929d41b7da09f8fbbb1d4, type: 3}
   description: Places a blood curse weakening target defense significantly.
   abilityType: 2
   cooldown: 8

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: astr_ab_02
   abilityName: Thunder Surge
-  icon: {fileID: -7600212347964918826, guid: 60fb6b16abae157498b7ecfe39c517bd, type: 3}
+  icon: {fileID: 21300000, guid: 7a55e9063c5a9124888ae6d3cd3615f9, type: 3}
   description: High-voltage dash that leaves an electrified trail.
   abilityType: 2
   cooldown: 6

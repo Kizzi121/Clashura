@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: sele_ab_03
   abilityName: Crescent Aura
-  icon: {fileID: 4678411972758501186, guid: 250773f241fb6d14096dd47a9d341841, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Reduces cooldowns for all nearby companions.
   abilityType: 0
   cooldown: 0

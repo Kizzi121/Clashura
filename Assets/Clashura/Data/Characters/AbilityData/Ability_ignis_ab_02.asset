@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: ignis_ab_02
   abilityName: Combustion Roar
-  icon: {fileID: 3030332880229863268, guid: b6fa5a60dc14d064f9e86f3c198bf81f, type: 3}
+  icon: {fileID: 21300000, guid: 7a55e9063c5a9124888ae6d3cd3615f9, type: 3}
   description: Intimidating roar that blasts opponents backward in flame.
   abilityType: 2
   cooldown: 8

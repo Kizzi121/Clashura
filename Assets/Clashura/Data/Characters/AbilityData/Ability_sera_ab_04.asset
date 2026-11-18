@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: sera_ab_04
   abilityName: Heavenly Revival
-  icon: {fileID: 2451322996196087290, guid: 1367d4f7cec41514da4f93d1219c73de, type: 3}
+  icon: {fileID: 21300000, guid: 25b0312339452cc4595be6293ea7d4a3, type: 3}
   description: Cleanses all negative debuffs and provides massive burst healing.
   abilityType: 3
   cooldown: 32

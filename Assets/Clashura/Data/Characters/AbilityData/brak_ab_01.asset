@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: brak_ab_01
   abilityName: Earthshaker
-  icon: {fileID: 3856764581869145426, guid: 857b9ba8e3a3b9141b01e25a44a323f1, type: 3}
+  icon: {fileID: 21300000, guid: 015c53290ce2888469baddec6c1aa7a3, type: 3}
   description: Slams his hammer into the earth fracturing ground.
   abilityType: 1
   cooldown: 3

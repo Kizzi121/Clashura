@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: ignis_ab_01
   abilityName: Flame Cleave
-  icon: {fileID: -8524695681556302700, guid: 899eeddf145350843af133badd4894a5, type: 3}
+  icon: {fileID: 21300000, guid: c431831de8de75945aa2dfccb67f4ef9, type: 3}
   description: Cleaves with a flaming edge scorching everything ahead.
   abilityType: 1
   cooldown: 2.5

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityId: lyra_ab_03
   abilityName: Hunter's Focus
-  icon: {fileID: 1963750171290471924, guid: 207c2c5ea786d0245b8473ee49b5aeee, type: 3}
+  icon: {fileID: 21300000, guid: b602e0a352ea05044b3186dcdefe2cb5, type: 3}
   description: Critical strike chance scales with distance from target.
   abilityType: 0
   cooldown: 0
