@@ -28,7 +28,8 @@ namespace Clashura.UI.Navigation
         public enum ScreenState
         {
             MainMenu,
-            CharacterSelection
+            CharacterSelection,
+            Settings
         }
 
         [Header("UI Panels")]
@@ -37,6 +38,9 @@ namespace Clashura.UI.Navigation
 
         [Tooltip("The root GameObject containing the Character Selection UI.")]
         [SerializeField] private GameObject characterSelectionPanel;
+
+        [Tooltip("The root GameObject containing the Settings UI.")]
+        [SerializeField] private GameObject settingsPanel;
 
         [Header("System References")]
         [SerializeField] private CharacterSelectionManager selectionManager;
@@ -87,8 +91,8 @@ namespace Clashura.UI.Navigation
         }
 
         /// <summary>
-        /// Shows the Main Menu panel and hides Character Selection.
-        /// Preserves all previously selected characters.
+        /// Shows the Main Menu panel and hides Character Selection and Settings.
+        /// Preserves all previously selected characters and settings.
         /// </summary>
         public void OpenMainMenu()
         {
@@ -97,6 +101,11 @@ namespace Clashura.UI.Navigation
             if (characterSelectionPanel != null)
             {
                 characterSelectionPanel.SetActive(false);
+            }
+
+            if (settingsPanel != null)
+            {
+                settingsPanel.SetActive(false);
             }
 
             if (mainMenuPanel != null)
@@ -118,6 +127,11 @@ namespace Clashura.UI.Navigation
                 mainMenuPanel.SetActive(false);
             }
 
+            if (settingsPanel != null)
+            {
+                settingsPanel.SetActive(false);
+            }
+
             if (characterSelectionPanel != null)
             {
                 characterSelectionPanel.SetActive(true);
@@ -126,6 +140,29 @@ namespace Clashura.UI.Navigation
             if (selectionUI != null)
             {
                 selectionUI.RefreshView();
+            }
+        }
+
+        /// <summary>
+        /// Hides the Main Menu and Character Selection, and activates the Settings panel.
+        /// </summary>
+        public void OpenSettings()
+        {
+            CurrentScreen = ScreenState.Settings;
+
+            if (mainMenuPanel != null)
+            {
+                mainMenuPanel.SetActive(false);
+            }
+
+            if (characterSelectionPanel != null)
+            {
+                characterSelectionPanel.SetActive(false);
+            }
+
+            if (settingsPanel != null)
+            {
+                settingsPanel.SetActive(true);
             }
         }
 

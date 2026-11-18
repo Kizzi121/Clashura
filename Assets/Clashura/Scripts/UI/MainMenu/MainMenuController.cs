@@ -87,12 +87,19 @@ namespace Clashura.UI.MainMenu
                 });
             }
 
-            // Button 4: SETTINGS (Visual only for now)
+            // Button 4: SETTINGS (Opens the Settings panel)
             if (settingsButton != null)
             {
                 settingsButton.onClick.AddListener(() =>
                 {
-                    ShowFeedback("Settings: Coming soon!");
+                    if (UINavigationController.Instance != null)
+                    {
+                        UINavigationController.Instance.OpenSettings();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[MainMenuController] UINavigationController.Instance is null!");
+                    }
                 });
             }
 

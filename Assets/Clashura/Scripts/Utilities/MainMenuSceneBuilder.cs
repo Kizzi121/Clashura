@@ -15,6 +15,8 @@ using Clashura.Characters.Managers;
 using Clashura.Characters.Preview;
 using Clashura.CharacterSelection.Managers;
 using Clashura.CharacterSelection.UI;
+using Clashura.Settings;
+using Clashura.Settings.UI;
 using Clashura.Core;
 
 namespace Clashura.Utilities
@@ -31,6 +33,7 @@ namespace Clashura.Utilities
         private const string CharSelectScenePath = "Assets/Clashura/Scenes/CharacterSelection/CharacterSelection.unity";
         private const string PrefabDir = "Assets/Clashura/Prefabs/UI/MainMenu";
         private const string ArtDir = "Assets/Clashura/Art/UI/MainMenu";
+        private const string SettingsArtDir = "Assets/Clashura/Art/UI/Settings";
         private const string FontPath = "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset";
 
         private static TMP_FontAsset _cachedFont;
@@ -51,6 +54,7 @@ namespace Clashura.Utilities
 
             // 1. Ensure original art assets exist
             MainMenuArtGenerator.GenerateAllArt();
+            SettingsArtGenerator.GenerateAllArt();
 
             // 2. Assign high-resolution themed archetype icons to ability data assets
             AssignThemedAbilityIcons();
@@ -64,19 +68,20 @@ namespace Clashura.Utilities
             // 4. Setup 2D Camera
             Setup2DCamera();
 
-            // 5. Setup Managers
-            var (navController, selectionManager) = SetupManagers();
+            // 5. Setup Managers (Navigation, CharacterSelection, and Settings)
+            var (navController, selectionManager, settingsManager) = SetupManagers();
 
             // 6. Setup EventSystem
             SetupEventSystem();
 
             // 7. Setup Master Canvas
-            var (canvasObj, mainMenuPanel, charSelectPanel, charSelectUI) = SetupMasterCanvas(selectionManager, navController, abilityPrefab);
+            var (canvasObj, mainMenuPanel, charSelectPanel, settingsPanel, charSelectUI) = SetupMasterCanvas(selectionManager, navController, abilityPrefab);
 
             // 8. Connect navigation controller serialized references
             var navSO = new SerializedObject(navController);
             navSO.FindProperty("mainMenuPanel").objectReferenceValue = mainMenuPanel;
             navSO.FindProperty("characterSelectionPanel").objectReferenceValue = charSelectPanel;
+            navSO.FindProperty("settingsPanel").objectReferenceValue = settingsPanel;
             navSO.FindProperty("selectionManager").objectReferenceValue = selectionManager;
             navSO.FindProperty("selectionUI").objectReferenceValue = charSelectUI;
             navSO.FindProperty("startingScreen").enumValueIndex = 0;
@@ -111,11 +116,12 @@ namespace Clashura.Utilities
             camObj.tag = "MainCamera";
         }
 
-        private static (UINavigationController, CharacterSelectionManager) SetupManagers()
+        private static (UINavigationController, CharacterSelectionManager, SettingsManager) SetupManagers()
         {
             GameObject mgrObj = new GameObject("[GameManagers]");
             var navController = mgrObj.AddComponent<UINavigationController>();
             var selectionManager = mgrObj.AddComponent<CharacterSelectionManager>();
+            var settingsManager = mgrObj.AddComponent<SettingsManager>();
 
             string dbPath = "Assets/Clashura/Data/Characters/ScriptableObjects/CharacterDatabase.asset";
             var db = AssetDatabase.LoadAssetAtPath<CharacterDatabaseSO>(dbPath);
@@ -127,7 +133,7 @@ namespace Clashura.Utilities
             selSO.ApplyModifiedProperties();
             EditorUtility.SetDirty(selectionManager);
 
-            return (navController, selectionManager);
+            return (navController, selectionManager, settingsManager);
         }
 
         private static void SetupEventSystem()
@@ -137,7 +143,7 @@ namespace Clashura.Utilities
             esObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
-        private static (GameObject, GameObject, GameObject, CharacterSelectionUI) SetupMasterCanvas(
+        private static (GameObject canvasObj, GameObject mainMenuPanel, GameObject charSelectPanel, GameObject settingsPanel, CharacterSelectionUI charSelectUI) SetupMasterCanvas(
             CharacterSelectionManager selectionManager, UINavigationController navController, AbilitySlotUI abilityPrefab)
         {
             // 1. Master Canvas
@@ -160,11 +166,15 @@ namespace Clashura.Utilities
             // 3. Build Character Selection Panel
             GameObject charSelectPanel = BuildCharacterSelectionPanel(canvasObj.transform, selectionManager, navController, abilityPrefab, out CharacterSelectionUI charSelectUI);
 
-            // Initially: Main Menu is active, Character Selection is inactive
+            // 4. Build Settings Panel
+            GameObject settingsPanel = BuildSettingsPanel(canvasObj.transform, navController);
+
+            // Initially: Main Menu is active, Character Selection and Settings are inactive
             mainMenuPanel.SetActive(true);
             charSelectPanel.SetActive(false);
+            settingsPanel.SetActive(false);
 
-            return (canvasObj, mainMenuPanel, charSelectPanel, charSelectUI);
+            return (canvasObj, mainMenuPanel, charSelectPanel, settingsPanel, charSelectUI);
         }
 
         #region Main Menu Panel Building
@@ -1141,6 +1151,589 @@ namespace Clashura.Utilities
                 }
             }
             AssetDatabase.SaveAssets();
+        }
+        #endregion
+
+        #region Settings Panel Building
+        private static GameObject BuildSettingsPanel(Transform parent, UINavigationController navController)
+        {
+            GameObject panel = new GameObject("SettingsPanel", typeof(RectTransform));
+            panel.transform.SetParent(parent, false);
+            var rect = panel.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.sizeDelta = Vector2.zero;
+
+            var settingsCtrl = panel.AddComponent<SettingsUIController>();
+
+            // 1. Scenic Backdrop (Tinted deep midnight for settings focus)
+            GameObject bgObj = new GameObject("Background", typeof(RectTransform), typeof(Image));
+            bgObj.transform.SetParent(panel.transform, false);
+            var bgRect = bgObj.GetComponent<RectTransform>();
+            bgRect.anchorMin = Vector2.zero;
+            bgRect.anchorMax = Vector2.one;
+            bgRect.sizeDelta = Vector2.zero;
+            var bgImg = bgObj.GetComponent<Image>();
+            bgImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/CharSelect_Background.png");
+            bgImg.color = new Color(0.50f, 0.55f, 0.70f, 1f);
+            bgImg.type = Image.Type.Simple;
+
+            // Safe Area
+            GameObject safeObj = new GameObject("SafeArea", typeof(RectTransform), typeof(SafeAreaHandler));
+            safeObj.transform.SetParent(panel.transform, false);
+            var safeRect = safeObj.GetComponent<RectTransform>();
+            safeRect.anchorMin = Vector2.zero;
+            safeRect.anchorMax = Vector2.one;
+            safeRect.sizeDelta = Vector2.zero;
+
+            // 2. Header Bar
+            // Back Button (Top-Left)
+            Button backBtn = CreateBackButton(safeRect.transform);
+
+            // Title & Subtitle (Top-Center)
+            GameObject titleObj = new GameObject("TitleSection", typeof(RectTransform));
+            titleObj.transform.SetParent(safeRect, false);
+            var tRect = titleObj.GetComponent<RectTransform>();
+            tRect.anchorMin = new Vector2(0.5f, 0.94f);
+            tRect.anchorMax = new Vector2(0.5f, 0.94f);
+            tRect.pivot = new Vector2(0.5f, 0.5f);
+            tRect.sizeDelta = new Vector2(600, 90);
+            tRect.anchoredPosition = Vector2.zero;
+
+            var titleTmp = CreateTMPText(titleObj.transform, "Title", "SETTINGS", 62, FontStyles.Bold, new Color(1.0f, 0.85f, 0.30f), 0, 0.35f, 1, 1);
+            titleTmp.alignment = TextAlignmentOptions.Center;
+            titleTmp.characterSpacing = 4f;
+
+            var subTmp = CreateTMPText(titleObj.transform, "Subtitle", "GAMEPLAY & SYSTEM CONFIGURATION", 18, FontStyles.Bold, new Color(0.65f, 0.80f, 0.98f, 0.9f), 0, 0, 1, 0.35f);
+            subTmp.alignment = TextAlignmentOptions.Center;
+            subTmp.characterSpacing = 5f;
+
+            // Reset Defaults Button (Top-Right)
+            GameObject rstObj = new GameObject("ResetDefaultsButton", typeof(RectTransform), typeof(Image), typeof(Button), typeof(UIButtonAnimator));
+            rstObj.transform.SetParent(safeRect, false);
+            var rstRect = rstObj.GetComponent<RectTransform>();
+            rstRect.anchorMin = new Vector2(1f, 1f);
+            rstRect.anchorMax = new Vector2(1f, 1f);
+            rstRect.pivot = new Vector2(1f, 1f);
+            rstRect.sizeDelta = new Vector2(230, 72);
+            rstRect.anchoredPosition = new Vector2(-25, -27);
+
+            var rstImg = rstObj.GetComponent<Image>();
+            rstImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Button_Reset.png");
+            rstImg.type = Image.Type.Simple;
+
+            var rstBtn = rstObj.GetComponent<Button>();
+            var rstTmp = CreateTMPText(rstObj.transform, "Text", "RESET DEFAULTS", 22, FontStyles.Bold, new Color(1.0f, 0.88f, 0.70f), 0, 0, 1, 1);
+            rstTmp.alignment = TextAlignmentOptions.Center;
+
+            // 3. Category Navigation Dock (Left Column, Width ~370px)
+            GameObject navDock = new GameObject("CategoryNavDock", typeof(RectTransform), typeof(VerticalLayoutGroup));
+            navDock.transform.SetParent(safeRect, false);
+            var ndRect = navDock.GetComponent<RectTransform>();
+            ndRect.anchorMin = new Vector2(0.018f, 0.04f);
+            ndRect.anchorMax = new Vector2(0.245f, 0.87f);
+            ndRect.sizeDelta = Vector2.zero;
+
+            var vlg = navDock.GetComponent<VerticalLayoutGroup>();
+            vlg.spacing = 14;
+            vlg.childAlignment = TextAnchor.UpperCenter;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = false;
+
+            Button audioTab = CreateCategoryTab(navDock.transform, "Tab_Audio", "AUDIO", $"{SettingsArtDir}/Icon_Tab_Audio.png");
+            Button graphicsTab = CreateCategoryTab(navDock.transform, "Tab_Graphics", "GRAPHICS", $"{SettingsArtDir}/Icon_Tab_Graphics.png");
+            Button controlsTab = CreateCategoryTab(navDock.transform, "Tab_Controls", "CONTROLS", $"{SettingsArtDir}/Icon_Tab_Controls.png");
+            Button gameplayTab = CreateCategoryTab(navDock.transform, "Tab_Gameplay", "GAMEPLAY", $"{SettingsArtDir}/Icon_Tab_Gameplay.png");
+            Button accessTab = CreateCategoryTab(navDock.transform, "Tab_Accessibility", "ACCESSIBILITY", $"{SettingsArtDir}/Icon_Tab_Accessibility.png");
+
+            // 4. Content Viewport Frame (Right Column)
+            GameObject contentFrame = new GameObject("ContentViewportFrame", typeof(RectTransform), typeof(Image));
+            contentFrame.transform.SetParent(safeRect, false);
+            var cfRect = contentFrame.GetComponent<RectTransform>();
+            cfRect.anchorMin = new Vector2(0.258f, 0.04f);
+            cfRect.anchorMax = new Vector2(0.982f, 0.87f);
+            cfRect.sizeDelta = Vector2.zero;
+
+            var cfImg = contentFrame.GetComponent<Image>();
+            cfImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Settings_Frame.png");
+            cfImg.type = Image.Type.Simple;
+
+            // Content Panels
+            // A. Audio Panel
+            GameObject audioPanel = CreateContentContainer(contentFrame.transform, "AudioContentPanel");
+            var (masterSlider, masterTxt) = CreateSliderRow(audioPanel.transform, "Row_MasterVolume", "MASTER VOLUME", 0f, 100f);
+            var (musicSlider, musicTxt) = CreateSliderRow(audioPanel.transform, "Row_MusicVolume", "MUSIC VOLUME", 0f, 100f);
+            var (sfxSlider, sfxTxt) = CreateSliderRow(audioPanel.transform, "Row_SFXVolume", "SOUND EFFECTS", 0f, 100f);
+            var (muteBtn, muteTxt, muteFill) = CreateToggleRow(audioPanel.transform, "Row_MuteAll", "MUTE ALL AUDIO");
+
+            // B. Graphics Panel
+            GameObject graphicsPanel = CreateContentContainer(contentFrame.transform, "GraphicsContentPanel");
+            var (qPrev, qNext, qTxt) = CreateStepperRow(graphicsPanel.transform, "Row_Quality", "GRAPHICS QUALITY");
+            var (fpsPrev, fpsNext, fpsTxt) = CreateStepperRow(graphicsPanel.transform, "Row_FPSLimit", "TARGET FRAME RATE");
+            var (vsyncBtn, vsyncTxt, vsyncFill) = CreateToggleRow(graphicsPanel.transform, "Row_VSync", "VERTICAL SYNC (VSYNC)");
+            var (fullBtn, fullTxt, fullFill) = CreateToggleRow(graphicsPanel.transform, "Row_Fullscreen", "FULLSCREEN MODE");
+            var (resPrev, resNext, resTxt) = CreateStepperRow(graphicsPanel.transform, "Row_Resolution", "SCREEN RESOLUTION");
+
+            // C. Controls Panel
+            GameObject controlsPanel = CreateContentContainer(contentFrame.transform, "ControlsContentPanel");
+            var (sensSlider, sensTxt) = CreateSliderRow(controlsPanel.transform, "Row_Sensitivity", "TOUCH SENSITIVITY", 0f, 100f);
+            var (btnSizePrev, btnSizeNext, btnSizeTxt) = CreateStepperRow(controlsPanel.transform, "Row_ButtonSize", "CONTROL BUTTON SIZE");
+            var (vibBtn, vibTxt, vibFill) = CreateToggleRow(controlsPanel.transform, "Row_Vibration", "HAPTIC VIBRATION");
+            var (layoutPrev, layoutNext, layoutTxt) = CreateStepperRow(controlsPanel.transform, "Row_Layout", "CONTROL SCHEME LAYOUT");
+
+            // D. Gameplay Panel
+            GameObject gameplayPanel = CreateContentContainer(contentFrame.transform, "GameplayContentPanel");
+            var (dmgBtn, dmgTxt, dmgFill) = CreateToggleRow(gameplayPanel.transform, "Row_DamageNumbers", "FLOATING DAMAGE NUMBERS");
+            var (shakeBtn, shakeTxt, shakeFill) = CreateToggleRow(gameplayPanel.transform, "Row_ScreenShake", "SCREEN IMPACT SHAKE");
+            var (notifBtn, notifTxt, notifFill) = CreateToggleRow(gameplayPanel.transform, "Row_BattleNotifs", "BATTLE NOTIFICATIONS");
+            var (vfxBtn, vfxTxt, vfxFill) = CreateToggleRow(gameplayPanel.transform, "Row_CombatVFX", "COMBAT PARTICLE EFFECTS");
+
+            // E. Accessibility Panel
+            GameObject accessPanel = CreateContentContainer(contentFrame.transform, "AccessibilityContentPanel");
+            var (scaleSlider, scaleTxt) = CreateSliderRow(accessPanel.transform, "Row_UIScale", "INTERFACE SCALE (UI)", 80f, 130f);
+            var (txtSizePrev, txtSizeNext, txtSizeTxt) = CreateStepperRow(accessPanel.transform, "Row_TextSize", "TYPOGRAPHY TEXT SIZE");
+            var (redEffBtn, redEffTxt, redEffFill) = CreateToggleRow(accessPanel.transform, "Row_ReduceEffects", "REDUCE FLASHING EFFECTS");
+            var (highConBtn, highConTxt, highConFill) = CreateToggleRow(accessPanel.transform, "Row_HighContrast", "HIGH CONTRAST MODE");
+
+            // 5. Reset Confirmation Popup Modal
+            ResetConfirmationPopupUI resetPopup = BuildResetConfirmationPopup(safeRect.transform);
+
+            // Wire Serialized Properties on SettingsUIController
+            var sSO = new SerializedObject(settingsCtrl);
+            sSO.FindProperty("audioTabButton").objectReferenceValue = audioTab;
+            sSO.FindProperty("graphicsTabButton").objectReferenceValue = graphicsTab;
+            sSO.FindProperty("controlsTabButton").objectReferenceValue = controlsTab;
+            sSO.FindProperty("gameplayTabButton").objectReferenceValue = gameplayTab;
+            sSO.FindProperty("accessibilityTabButton").objectReferenceValue = accessTab;
+
+            sSO.FindProperty("audioContentPanel").objectReferenceValue = audioPanel;
+            sSO.FindProperty("graphicsContentPanel").objectReferenceValue = graphicsPanel;
+            sSO.FindProperty("controlsContentPanel").objectReferenceValue = controlsPanel;
+            sSO.FindProperty("gameplayContentPanel").objectReferenceValue = gameplayPanel;
+            sSO.FindProperty("accessibilityContentPanel").objectReferenceValue = accessPanel;
+
+            sSO.FindProperty("backButton").objectReferenceValue = backBtn;
+            sSO.FindProperty("resetDefaultsButton").objectReferenceValue = rstBtn;
+            sSO.FindProperty("resetPopup").objectReferenceValue = resetPopup;
+
+            sSO.FindProperty("masterVolumeSlider").objectReferenceValue = masterSlider;
+            sSO.FindProperty("masterVolumeText").objectReferenceValue = masterTxt;
+            sSO.FindProperty("musicVolumeSlider").objectReferenceValue = musicSlider;
+            sSO.FindProperty("musicVolumeText").objectReferenceValue = musicTxt;
+            sSO.FindProperty("sfxVolumeSlider").objectReferenceValue = sfxSlider;
+            sSO.FindProperty("sfxVolumeText").objectReferenceValue = sfxTxt;
+            sSO.FindProperty("muteAllToggleButton").objectReferenceValue = muteBtn;
+            sSO.FindProperty("muteAllToggleText").objectReferenceValue = muteTxt;
+            sSO.FindProperty("muteAllToggleFill").objectReferenceValue = muteFill;
+
+            sSO.FindProperty("qualityPrevButton").objectReferenceValue = qPrev;
+            sSO.FindProperty("qualityNextButton").objectReferenceValue = qNext;
+            sSO.FindProperty("qualityText").objectReferenceValue = qTxt;
+            sSO.FindProperty("fpsPrevButton").objectReferenceValue = fpsPrev;
+            sSO.FindProperty("fpsNextButton").objectReferenceValue = fpsNext;
+            sSO.FindProperty("fpsText").objectReferenceValue = fpsTxt;
+            sSO.FindProperty("vsyncToggleButton").objectReferenceValue = vsyncBtn;
+            sSO.FindProperty("vsyncToggleText").objectReferenceValue = vsyncTxt;
+            sSO.FindProperty("vsyncToggleFill").objectReferenceValue = vsyncFill;
+            sSO.FindProperty("fullscreenToggleButton").objectReferenceValue = fullBtn;
+            sSO.FindProperty("fullscreenToggleText").objectReferenceValue = fullTxt;
+            sSO.FindProperty("fullscreenToggleFill").objectReferenceValue = fullFill;
+            sSO.FindProperty("resPrevButton").objectReferenceValue = resPrev;
+            sSO.FindProperty("resNextButton").objectReferenceValue = resNext;
+            sSO.FindProperty("resText").objectReferenceValue = resTxt;
+
+            sSO.FindProperty("sensitivitySlider").objectReferenceValue = sensSlider;
+            sSO.FindProperty("sensitivityText").objectReferenceValue = sensTxt;
+            sSO.FindProperty("btnSizePrevButton").objectReferenceValue = btnSizePrev;
+            sSO.FindProperty("btnSizeNextButton").objectReferenceValue = btnSizeNext;
+            sSO.FindProperty("btnSizeText").objectReferenceValue = btnSizeTxt;
+            sSO.FindProperty("vibrationToggleButton").objectReferenceValue = vibBtn;
+            sSO.FindProperty("vibrationToggleText").objectReferenceValue = vibTxt;
+            sSO.FindProperty("vibrationToggleFill").objectReferenceValue = vibFill;
+            sSO.FindProperty("layoutPrevButton").objectReferenceValue = layoutPrev;
+            sSO.FindProperty("layoutNextButton").objectReferenceValue = layoutNext;
+            sSO.FindProperty("layoutText").objectReferenceValue = layoutTxt;
+
+            sSO.FindProperty("damageNumbersToggleButton").objectReferenceValue = dmgBtn;
+            sSO.FindProperty("damageNumbersToggleText").objectReferenceValue = dmgTxt;
+            sSO.FindProperty("damageNumbersToggleFill").objectReferenceValue = dmgFill;
+            sSO.FindProperty("screenShakeToggleButton").objectReferenceValue = shakeBtn;
+            sSO.FindProperty("screenShakeToggleText").objectReferenceValue = shakeTxt;
+            sSO.FindProperty("screenShakeToggleFill").objectReferenceValue = shakeFill;
+            sSO.FindProperty("battleNotifsToggleButton").objectReferenceValue = notifBtn;
+            sSO.FindProperty("battleNotifsToggleText").objectReferenceValue = notifTxt;
+            sSO.FindProperty("battleNotifsToggleFill").objectReferenceValue = notifFill;
+            sSO.FindProperty("combatVFXToggleButton").objectReferenceValue = vfxBtn;
+            sSO.FindProperty("combatVFXToggleText").objectReferenceValue = vfxTxt;
+            sSO.FindProperty("combatVFXToggleFill").objectReferenceValue = vfxFill;
+
+            sSO.FindProperty("uiScaleSlider").objectReferenceValue = scaleSlider;
+            sSO.FindProperty("uiScaleText").objectReferenceValue = scaleTxt;
+            sSO.FindProperty("textSizePrevButton").objectReferenceValue = txtSizePrev;
+            sSO.FindProperty("textSizeNextButton").objectReferenceValue = txtSizeNext;
+            sSO.FindProperty("textSizeText").objectReferenceValue = txtSizeTxt;
+            sSO.FindProperty("reduceEffectsToggleButton").objectReferenceValue = redEffBtn;
+            sSO.FindProperty("reduceEffectsToggleText").objectReferenceValue = redEffTxt;
+            sSO.FindProperty("reduceEffectsToggleFill").objectReferenceValue = redEffFill;
+            sSO.FindProperty("highContrastToggleButton").objectReferenceValue = highConBtn;
+            sSO.FindProperty("highContrastToggleText").objectReferenceValue = highConTxt;
+            sSO.FindProperty("highContrastToggleFill").objectReferenceValue = highConFill;
+
+            sSO.ApplyModifiedProperties();
+            EditorUtility.SetDirty(settingsCtrl);
+
+            return panel;
+        }
+
+        private static Button CreateCategoryTab(Transform parent, string name, string label, string iconPath)
+        {
+            GameObject tabObj = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement), typeof(UIButtonAnimator));
+            tabObj.transform.SetParent(parent, false);
+
+            var le = tabObj.GetComponent<LayoutElement>();
+            le.preferredWidth = 350;
+            le.preferredHeight = 76;
+
+            var rect = tabObj.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(350, 76);
+
+            var img = tabObj.GetComponent<Image>();
+            img.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Tab_Normal.png");
+            img.type = Image.Type.Simple;
+
+            var btn = tabObj.GetComponent<Button>();
+
+            // Icon
+            GameObject iconObj = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+            iconObj.transform.SetParent(tabObj.transform, false);
+            var iRect = iconObj.GetComponent<RectTransform>();
+            iRect.anchorMin = new Vector2(0, 0.5f);
+            iRect.anchorMax = new Vector2(0, 0.5f);
+            iRect.pivot = new Vector2(0, 0.5f);
+            iRect.sizeDelta = new Vector2(44, 44);
+            iRect.anchoredPosition = new Vector2(20, 0);
+            var iImg = iconObj.GetComponent<Image>();
+            iImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(iconPath);
+            iImg.preserveAspect = true;
+            iImg.raycastTarget = false;
+
+            // Label
+            var lblTmp = CreateTMPText(tabObj.transform, "Label", label, 24, FontStyles.Bold, Color.white, 0.22f, 0, 0.98f, 1);
+            lblTmp.alignment = TextAlignmentOptions.MidlineLeft;
+
+            return btn;
+        }
+
+        private static GameObject CreateContentContainer(Transform parent, string name)
+        {
+            GameObject contObj = new GameObject(name, typeof(RectTransform), typeof(VerticalLayoutGroup));
+            contObj.transform.SetParent(parent, false);
+            var rect = contObj.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.sizeDelta = Vector2.zero;
+
+            var vlg = contObj.GetComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(45, 45, 35, 35);
+            vlg.spacing = 18;
+            vlg.childAlignment = TextAnchor.UpperCenter;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = false;
+
+            return contObj;
+        }
+
+        private static (Slider, TextMeshProUGUI) CreateSliderRow(Transform parent, string name, string label, float minVal, float maxVal)
+        {
+            GameObject rowObj = new GameObject(name, typeof(RectTransform), typeof(LayoutElement));
+            rowObj.transform.SetParent(parent, false);
+            var le = rowObj.GetComponent<LayoutElement>();
+            le.preferredHeight = 74;
+
+            var rect = rowObj.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, 74);
+
+            // Label (Left)
+            var lblTmp = CreateTMPText(rowObj.transform, "Label", label, 24, FontStyles.Bold, Color.white, 0.02f, 0, 0.38f, 1);
+            lblTmp.alignment = TextAlignmentOptions.MidlineLeft;
+
+            // Slider (Center)
+            GameObject sliderObj = new GameObject("Slider", typeof(RectTransform), typeof(Slider));
+            sliderObj.transform.SetParent(rowObj.transform, false);
+            var slRect = sliderObj.GetComponent<RectTransform>();
+            slRect.anchorMin = new Vector2(0.40f, 0.5f);
+            slRect.anchorMax = new Vector2(0.85f, 0.5f);
+            slRect.pivot = new Vector2(0.5f, 0.5f);
+            slRect.sizeDelta = new Vector2(0, 24);
+
+            var slider = sliderObj.GetComponent<Slider>();
+            slider.minValue = minVal;
+            slider.maxValue = maxVal;
+
+            // Background Track
+            GameObject bgObj = new GameObject("Background", typeof(RectTransform), typeof(Image));
+            bgObj.transform.SetParent(sliderObj.transform, false);
+            var bgRect = bgObj.GetComponent<RectTransform>();
+            bgRect.anchorMin = Vector2.zero;
+            bgRect.anchorMax = Vector2.one;
+            bgRect.sizeDelta = Vector2.zero;
+            var bgImg = bgObj.GetComponent<Image>();
+            bgImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Slider_Track.png");
+            bgImg.type = Image.Type.Simple;
+
+            // Fill Area & Fill
+            GameObject faObj = new GameObject("Fill Area", typeof(RectTransform));
+            faObj.transform.SetParent(sliderObj.transform, false);
+            var faRect = faObj.GetComponent<RectTransform>();
+            faRect.anchorMin = new Vector2(0, 0.25f);
+            faRect.anchorMax = new Vector2(1, 0.75f);
+            faRect.sizeDelta = new Vector2(-20, 0);
+
+            GameObject fillObj = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+            fillObj.transform.SetParent(faObj.transform, false);
+            var fRect = fillObj.GetComponent<RectTransform>();
+            fRect.sizeDelta = Vector2.zero;
+            var fImg = fillObj.GetComponent<Image>();
+            fImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Slider_Fill.png");
+            fImg.type = Image.Type.Simple;
+
+            // Handle Slide Area & Handle
+            GameObject haObj = new GameObject("Handle Slide Area", typeof(RectTransform));
+            haObj.transform.SetParent(sliderObj.transform, false);
+            var haRect = haObj.GetComponent<RectTransform>();
+            haRect.anchorMin = Vector2.zero;
+            haRect.anchorMax = Vector2.one;
+            haRect.sizeDelta = new Vector2(-20, 0);
+
+            GameObject handleObj = new GameObject("Handle", typeof(RectTransform), typeof(Image));
+            handleObj.transform.SetParent(haObj.transform, false);
+            var hRect = handleObj.GetComponent<RectTransform>();
+            hRect.sizeDelta = new Vector2(46, 46);
+            var hImg = handleObj.GetComponent<Image>();
+            hImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Slider_Knob.png");
+            hImg.preserveAspect = true;
+
+            slider.fillRect = fRect;
+            slider.handleRect = hRect;
+            slider.targetGraphic = hImg;
+            slider.direction = Slider.Direction.LeftToRight;
+
+            // Value Text (Right)
+            var valTmp = CreateTMPText(rowObj.transform, "ValueText", $"{Mathf.RoundToInt(maxVal)}%", 22, FontStyles.Bold, new Color(1.0f, 0.85f, 0.35f), 0.87f, 0, 0.98f, 1);
+            valTmp.alignment = TextAlignmentOptions.MidlineRight;
+
+            return (slider, valTmp);
+        }
+
+        private static (Button, TextMeshProUGUI, Image) CreateToggleRow(Transform parent, string name, string label)
+        {
+            GameObject rowObj = new GameObject(name, typeof(RectTransform), typeof(LayoutElement));
+            rowObj.transform.SetParent(parent, false);
+            var le = rowObj.GetComponent<LayoutElement>();
+            le.preferredHeight = 74;
+
+            var rect = rowObj.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, 74);
+
+            // Label (Left)
+            var lblTmp = CreateTMPText(rowObj.transform, "Label", label, 24, FontStyles.Bold, Color.white, 0.02f, 0, 0.48f, 1);
+            lblTmp.alignment = TextAlignmentOptions.MidlineLeft;
+
+            // Toggle Button (Center)
+            GameObject toggleObj = new GameObject("ToggleButton", typeof(RectTransform), typeof(Image), typeof(Button), typeof(UIButtonAnimator));
+            toggleObj.transform.SetParent(rowObj.transform, false);
+            var tgRect = toggleObj.GetComponent<RectTransform>();
+            tgRect.anchorMin = new Vector2(0.60f, 0.5f);
+            tgRect.anchorMax = new Vector2(0.60f, 0.5f);
+            tgRect.pivot = new Vector2(0.5f, 0.5f);
+            tgRect.sizeDelta = new Vector2(110, 46);
+
+            var tgImg = toggleObj.GetComponent<Image>();
+            tgImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Toggle_Track.png");
+            tgImg.type = Image.Type.Simple;
+
+            var btn = toggleObj.GetComponent<Button>();
+
+            // Fill / Knob indicator inside toggle
+            GameObject fillObj = new GameObject("ToggleFill", typeof(RectTransform), typeof(Image));
+            fillObj.transform.SetParent(toggleObj.transform, false);
+            var flRect = fillObj.GetComponent<RectTransform>();
+            flRect.anchorMin = Vector2.zero;
+            flRect.anchorMax = Vector2.one;
+            flRect.sizeDelta = new Vector2(-6, -6);
+            var flImg = fillObj.GetComponent<Image>();
+            flImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Toggle_Knob.png");
+            flImg.color = new Color(0.20f, 0.85f, 0.45f, 1f);
+            flImg.preserveAspect = true;
+
+            // State Text (Right)
+            var stateTmp = CreateTMPText(rowObj.transform, "StateText", "ON", 22, FontStyles.Bold, new Color(0.30f, 1.0f, 0.55f), 0.74f, 0, 0.95f, 1);
+            stateTmp.alignment = TextAlignmentOptions.MidlineLeft;
+
+            return (btn, stateTmp, flImg);
+        }
+
+        private static (Button, Button, TextMeshProUGUI) CreateStepperRow(Transform parent, string name, string label)
+        {
+            GameObject rowObj = new GameObject(name, typeof(RectTransform), typeof(LayoutElement));
+            rowObj.transform.SetParent(parent, false);
+            var le = rowObj.GetComponent<LayoutElement>();
+            le.preferredHeight = 74;
+
+            var rect = rowObj.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, 74);
+
+            // Label (Left)
+            var lblTmp = CreateTMPText(rowObj.transform, "Label", label, 24, FontStyles.Bold, Color.white, 0.02f, 0, 0.40f, 1);
+            lblTmp.alignment = TextAlignmentOptions.MidlineLeft;
+
+            // Stepper Container (Right side)
+            GameObject stepObj = new GameObject("StepperContainer", typeof(RectTransform));
+            stepObj.transform.SetParent(rowObj.transform, false);
+            var stRect = stepObj.GetComponent<RectTransform>();
+            stRect.anchorMin = new Vector2(0.50f, 0.5f);
+            stRect.anchorMax = new Vector2(0.95f, 0.5f);
+            stRect.pivot = new Vector2(0.5f, 0.5f);
+            stRect.sizeDelta = new Vector2(0, 52);
+
+            // Left Chevron (<)
+            GameObject prevObj = new GameObject("PrevBtn", typeof(RectTransform), typeof(Image), typeof(Button), typeof(UIButtonAnimator));
+            prevObj.transform.SetParent(stepObj.transform, false);
+            var pRect = prevObj.GetComponent<RectTransform>();
+            pRect.anchorMin = new Vector2(0, 0.5f);
+            pRect.anchorMax = new Vector2(0, 0.5f);
+            pRect.pivot = new Vector2(0, 0.5f);
+            pRect.sizeDelta = new Vector2(48, 48);
+            var pImg = prevObj.GetComponent<Image>();
+            pImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/Icon_Chevron_Left.png");
+            pImg.preserveAspect = true;
+            var prevBtn = prevObj.GetComponent<Button>();
+
+            // Value Box
+            GameObject boxObj = new GameObject("ValueBox", typeof(RectTransform), typeof(Image));
+            boxObj.transform.SetParent(stepObj.transform, false);
+            var bRect = boxObj.GetComponent<RectTransform>();
+            bRect.anchorMin = new Vector2(0.15f, 0f);
+            bRect.anchorMax = new Vector2(0.85f, 1f);
+            bRect.sizeDelta = Vector2.zero;
+            var bImg = boxObj.GetComponent<Image>();
+            bImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Stepper_Box.png");
+            bImg.type = Image.Type.Simple;
+
+            var valTmp = CreateTMPText(boxObj.transform, "Text", "OPTION", 22, FontStyles.Bold, new Color(1.0f, 0.85f, 0.35f), 0, 0, 1, 1);
+            valTmp.alignment = TextAlignmentOptions.Center;
+
+            // Right Chevron (>)
+            GameObject nextObj = new GameObject("NextBtn", typeof(RectTransform), typeof(Image), typeof(Button), typeof(UIButtonAnimator));
+            nextObj.transform.SetParent(stepObj.transform, false);
+            var nRect = nextObj.GetComponent<RectTransform>();
+            nRect.anchorMin = new Vector2(1, 0.5f);
+            nRect.anchorMax = new Vector2(1, 0.5f);
+            nRect.pivot = new Vector2(1, 0.5f);
+            nRect.sizeDelta = new Vector2(48, 48);
+            var nImg = nextObj.GetComponent<Image>();
+            nImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/Icon_Chevron_Right.png");
+            nImg.preserveAspect = true;
+            var nextBtn = nextObj.GetComponent<Button>();
+
+            return (prevBtn, nextBtn, valTmp);
+        }
+
+        private static ResetConfirmationPopupUI BuildResetConfirmationPopup(Transform parent)
+        {
+            GameObject root = new GameObject("ResetConfirmationPopup", typeof(RectTransform), typeof(ResetConfirmationPopupUI));
+            root.transform.SetParent(parent, false);
+            var rootRect = root.GetComponent<RectTransform>();
+            rootRect.anchorMin = Vector2.zero;
+            rootRect.anchorMax = Vector2.one;
+            rootRect.sizeDelta = Vector2.zero;
+
+            // Overlay
+            GameObject overlay = new GameObject("DarkOverlay", typeof(RectTransform), typeof(Image));
+            overlay.transform.SetParent(root.transform, false);
+            var oRect = overlay.GetComponent<RectTransform>();
+            oRect.anchorMin = Vector2.zero;
+            oRect.anchorMax = Vector2.one;
+            oRect.sizeDelta = Vector2.zero;
+            var oImg = overlay.GetComponent<Image>();
+            oImg.color = new Color(0.02f, 0.04f, 0.08f, 0.82f);
+            oImg.raycastTarget = true;
+
+            // Dialog Panel
+            GameObject dialog = new GameObject("PopupPanel", typeof(RectTransform), typeof(Image));
+            dialog.transform.SetParent(root.transform, false);
+            var dRect = dialog.GetComponent<RectTransform>();
+            dRect.anchorMin = new Vector2(0.5f, 0.5f);
+            dRect.anchorMax = new Vector2(0.5f, 0.5f);
+            dRect.pivot = new Vector2(0.5f, 0.5f);
+            dRect.sizeDelta = new Vector2(760, 420);
+            var dImg = dialog.GetComponent<Image>();
+            dImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/UI_Popup_Frame.png");
+            dImg.type = Image.Type.Simple;
+
+            // Heading
+            var headTmp = CreateTMPText(dialog.transform, "HeadingText", "RESET ALL SETTINGS?", 32, FontStyles.Bold, new Color(1.0f, 0.85f, 0.30f), 0.05f, 0.68f, 0.95f, 0.88f);
+            headTmp.alignment = TextAlignmentOptions.Center;
+            headTmp.characterSpacing = 3f;
+
+            // Message
+            var msgTmp = CreateTMPText(dialog.transform, "MessageText", "Are you sure you want to restore default settings?", 23, FontStyles.Bold, Color.white, 0.05f, 0.48f, 0.95f, 0.64f);
+            msgTmp.alignment = TextAlignmentOptions.Center;
+
+            // Subtitle
+            var subTmp = CreateTMPText(dialog.transform, "SubtitleText", "All custom audio, graphics, controls and gameplay adjustments will be reverted.", 18, FontStyles.Normal, new Color(0.75f, 0.85f, 0.98f, 0.95f), 0.05f, 0.32f, 0.95f, 0.46f);
+            subTmp.alignment = TextAlignmentOptions.Center;
+
+            // Cancel Button
+            GameObject cancelObj = new GameObject("CancelButton", typeof(RectTransform), typeof(Image), typeof(Button), typeof(UIButtonAnimator));
+            cancelObj.transform.SetParent(dialog.transform, false);
+            var cRect = cancelObj.GetComponent<RectTransform>();
+            cRect.anchorMin = new Vector2(0.28f, 0f);
+            cRect.anchorMax = new Vector2(0.28f, 0f);
+            cRect.pivot = new Vector2(0.5f, 0f);
+            cRect.sizeDelta = new Vector2(200, 64);
+            cRect.anchoredPosition = new Vector2(0, 32);
+
+            var cImg = cancelObj.GetComponent<Image>();
+            cImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/UI_Button_Popup_OK.png");
+            cImg.type = Image.Type.Simple;
+
+            var cancelBtn = cancelObj.GetComponent<Button>();
+            var cTmp = CreateTMPText(cancelObj.transform, "Text", "CANCEL", 24, FontStyles.Bold, Color.white, 0, 0, 1, 1);
+            cTmp.alignment = TextAlignmentOptions.Center;
+
+            // Confirm Button
+            GameObject confObj = new GameObject("ConfirmButton", typeof(RectTransform), typeof(Image), typeof(Button), typeof(UIButtonAnimator));
+            confObj.transform.SetParent(dialog.transform, false);
+            var cfRect = confObj.GetComponent<RectTransform>();
+            cfRect.anchorMin = new Vector2(0.72f, 0f);
+            cfRect.anchorMax = new Vector2(0.72f, 0f);
+            cfRect.pivot = new Vector2(0.5f, 0f);
+            cfRect.sizeDelta = new Vector2(200, 64);
+            cfRect.anchoredPosition = new Vector2(0, 32);
+
+            var cfImg = confObj.GetComponent<Image>();
+            cfImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{SettingsArtDir}/UI_Button_Reset.png");
+            cfImg.type = Image.Type.Simple;
+
+            var confBtn = confObj.GetComponent<Button>();
+            var cfTmp = CreateTMPText(confObj.transform, "Text", "CONFIRM", 24, FontStyles.Bold, Color.white, 0, 0, 1, 1);
+            cfTmp.alignment = TextAlignmentOptions.Center;
+
+            // Wire properties
+            var popupUI = root.GetComponent<ResetConfirmationPopupUI>();
+            var pSO = new SerializedObject(popupUI);
+            pSO.FindProperty("darkOverlay").objectReferenceValue = overlay;
+            pSO.FindProperty("popupPanel").objectReferenceValue = dialog;
+            pSO.FindProperty("headingText").objectReferenceValue = headTmp;
+            pSO.FindProperty("messageText").objectReferenceValue = msgTmp;
+            pSO.FindProperty("subtitleText").objectReferenceValue = subTmp;
+            pSO.FindProperty("confirmButton").objectReferenceValue = confBtn;
+            pSO.FindProperty("cancelButton").objectReferenceValue = cancelBtn;
+            pSO.ApplyModifiedProperties();
+
+            root.SetActive(false);
+            return popupUI;
         }
         #endregion
 
