@@ -61,7 +61,36 @@ namespace Clashura.Characters.Managers
                 BuildLookup();
             }
 
-            return _idLookup.TryGetValue(characterId, out var charData) ? charData : null;
+            if (_idLookup.TryGetValue(characterId, out var charData))
+            {
+                return charData;
+            }
+
+            // Fallback: match by CharacterName or normalized slug
+            string normTarget = characterId.Trim().ToLowerInvariant().Replace(" ", "").Replace("_", "").Replace("-", "");
+            for (int i = 0; i < characters.Count; i++)
+            {
+                var c = characters[i];
+                if (c == null) continue;
+
+                if (string.Equals(c.CharacterId, characterId, StringComparison.OrdinalIgnoreCase))
+                {
+                    return c;
+                }
+
+                if (string.Equals(c.CharacterName, characterId, StringComparison.OrdinalIgnoreCase))
+                {
+                    return c;
+                }
+
+                string normName = c.CharacterName.Trim().ToLowerInvariant().Replace(" ", "").Replace("_", "").Replace("-", "");
+                if (normName == normTarget || normTarget.Contains(normName) || normName.Contains(normTarget))
+                {
+                    return c;
+                }
+            }
+
+            return null;
         }
 
         public CharacterDataSO GetCharacterByIndex(int index)

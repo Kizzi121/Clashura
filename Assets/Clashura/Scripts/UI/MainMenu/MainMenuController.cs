@@ -53,14 +53,8 @@ namespace Clashura.UI.MainMenu
 
         private void HookButtons()
         {
-            // Button 1: PLAYER VS PLAYER (Visual only for now)
-            if (pvpButton != null)
-            {
-                pvpButton.onClick.AddListener(() =>
-                {
-                    ShowFeedback("Player vs Player: Coming soon in multiplayer update!");
-                });
-            }
+            // Button 1: PLAYER VS PLAYER is handled by PvPMenuController for 1v1 Photon Fusion 2 matchmaking
+            // We intentionally do NOT attach placeholder feedback here.
 
             // Button 2: RANDOM MATCH (Visual only for now)
             if (randomMatchButton != null)
