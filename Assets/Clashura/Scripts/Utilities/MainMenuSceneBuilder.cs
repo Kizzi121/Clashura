@@ -18,6 +18,7 @@ using Clashura.CharacterSelection.UI;
 using Clashura.Settings;
 using Clashura.Settings.UI;
 using Clashura.Core;
+using Clashura.Multiplayer;
 
 namespace Clashura.Utilities
 {
@@ -334,7 +335,98 @@ namespace Clashura.Utilities
             ctrlSO.FindProperty("feedbackText").objectReferenceValue = ttTmp;
             ctrlSO.ApplyModifiedProperties();
 
+            // Build Team Warning Panel for 1v1 PvP
+            BuildTeamWarningPanel(panel.transform, btnPvp.GetComponent<Button>());
+
             return panel;
+        }
+
+        private static void BuildTeamWarningPanel(Transform parent, Button pvpButton)
+        {
+            // 1. Modal Scrim (fullscreen blocker)
+            GameObject warnObj = new GameObject("TeamWarningPanel", typeof(RectTransform), typeof(Image));
+            warnObj.transform.SetParent(parent, false);
+            var rect = warnObj.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.sizeDelta = Vector2.zero;
+
+            var bgImg = warnObj.GetComponent<Image>();
+            bgImg.color = new Color(0.02f, 0.04f, 0.08f, 0.90f);
+
+            // 2. Dialog Frame Container
+            GameObject dialogObj = new GameObject("DialogFrame", typeof(RectTransform), typeof(Image));
+            dialogObj.transform.SetParent(warnObj.transform, false);
+            var dRect = dialogObj.GetComponent<RectTransform>();
+            dRect.anchorMin = new Vector2(0.5f, 0.5f);
+            dRect.anchorMax = new Vector2(0.5f, 0.5f);
+            dRect.pivot = new Vector2(0.5f, 0.5f);
+            dRect.sizeDelta = new Vector2(720, 460);
+            dRect.anchoredPosition = Vector2.zero;
+
+            var dImg = dialogObj.GetComponent<Image>();
+            dImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/UI_Popup_Frame.png");
+            dImg.type = Image.Type.Sliced;
+            dImg.color = Color.white;
+
+            // 3. Warning Icon (Emblem at top)
+            GameObject iconObj = new GameObject("WarningIcon", typeof(RectTransform), typeof(Image));
+            iconObj.transform.SetParent(dialogObj.transform, false);
+            var icRect = iconObj.GetComponent<RectTransform>();
+            icRect.anchorMin = new Vector2(0.5f, 1f);
+            icRect.anchorMax = new Vector2(0.5f, 1f);
+            icRect.pivot = new Vector2(0.5f, 1f);
+            icRect.anchoredPosition = new Vector2(0, -40);
+            icRect.sizeDelta = new Vector2(76, 76);
+
+            var icImg = iconObj.GetComponent<Image>();
+            icImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/Icon_Popup_Warning.png");
+            icImg.preserveAspect = true;
+
+            // 4. Header Tag
+            var tagTmp = CreateTMPText(dialogObj.transform, "TagText", "ONLINE DUEL REQUIRES A TEAM", 20, FontStyles.Bold, new Color(0.65f, 0.78f, 0.95f), 0.05f, 0.65f, 0.95f, 0.75f);
+            tagTmp.alignment = TextAlignmentOptions.Center;
+            tagTmp.characterSpacing = 2f;
+
+            // 5. Primary Warning Message Text (EXACT specification: "Please Select Your Team First!")
+            var warnTmp = CreateTMPText(dialogObj.transform, "WarningMessageText", "Please Select Your Team First!", 34, FontStyles.Bold, new Color(1.0f, 0.85f, 0.30f), 0.04f, 0.48f, 0.96f, 0.64f);
+            warnTmp.alignment = TextAlignmentOptions.Center;
+
+            // 6. Subtitle / Guidance
+            var subTmp = CreateTMPText(dialogObj.transform, "SubtitleText", "You must assemble a team of 3 champions before entering Player vs Player matchmaking.", 19, FontStyles.Normal, new Color(0.80f, 0.88f, 0.98f, 0.92f), 0.08f, 0.32f, 0.92f, 0.46f);
+            subTmp.alignment = TextAlignmentOptions.Center;
+
+            // 7. SINGLE BUTTON: "Go to Character Selection" (strictly NO other buttons!)
+            GameObject btnObj = new GameObject("Btn_GoToCharacterSelection", typeof(RectTransform), typeof(Image), typeof(Button), typeof(UIButtonAnimator));
+            btnObj.transform.SetParent(dialogObj.transform, false);
+            var bRect = btnObj.GetComponent<RectTransform>();
+            bRect.anchorMin = new Vector2(0.5f, 0.12f);
+            bRect.anchorMax = new Vector2(0.5f, 0.12f);
+            bRect.pivot = new Vector2(0.5f, 0.5f);
+            bRect.sizeDelta = new Vector2(420, 68);
+
+            var bImg = btnObj.GetComponent<Image>();
+            bImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/UI_Button_Normal.png");
+            bImg.type = Image.Type.Sliced;
+            bImg.color = Color.white;
+            var goBtn = btnObj.GetComponent<Button>();
+
+            var btnTxt = CreateTMPText(btnObj.transform, "BtnText", "Go to Character Selection", 22, FontStyles.Bold, new Color(1.0f, 0.88f, 0.35f), 0, 0, 1, 1);
+            btnTxt.alignment = TextAlignmentOptions.Center;
+
+            // Initially hidden
+            warnObj.SetActive(false);
+
+            // Attach and configure PvPMenuController on parent panel
+            var pvpCtrl = parent.gameObject.AddComponent<PvPMenuController>();
+            var pvpSO = new SerializedObject(pvpCtrl);
+            pvpSO.FindProperty("pvpButton").objectReferenceValue = pvpButton;
+            pvpSO.FindProperty("teamWarningPanel").objectReferenceValue = warnObj;
+            pvpSO.FindProperty("warningMessageText").objectReferenceValue = warnTmp;
+            pvpSO.FindProperty("goToCharacterSelectionButton").objectReferenceValue = goBtn;
+            pvpSO.FindProperty("matchmakingSceneName").stringValue = "PvP_Matchmaking";
+            pvpSO.FindProperty("characterSelectionSceneName").stringValue = "CharacterSelection";
+            pvpSO.ApplyModifiedProperties();
         }
 
         private static void BuildCommanderProfileBadge(Transform parent)

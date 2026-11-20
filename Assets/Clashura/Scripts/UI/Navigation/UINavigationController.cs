@@ -137,6 +137,16 @@ namespace Clashura.UI.Navigation
                 characterSelectionPanel.SetActive(true);
             }
 
+            if (selectionManager == null)
+            {
+                selectionManager = FindFirstObjectByType<CharacterSelectionManager>();
+            }
+
+            if (selectionManager != null && selectionManager.SelectedCharacterIds.Count == 0)
+            {
+                selectionManager.LoadSavedSelections();
+            }
+
             if (selectionUI != null)
             {
                 selectionUI.RefreshView();

@@ -129,9 +129,18 @@ namespace Clashura.CharacterSelection.UI
                 selectionManager = FindFirstObjectByType<CharacterSelectionManager>();
             }
 
-            if (selectionManager != null && selectionManager.CurrentCharacter != null)
+            if (selectionManager != null)
             {
-                HandleCurrentCharacterChanged(selectionManager.CurrentCharacter);
+                if (selectionManager.SelectedCharacterIds.Count == 0)
+                {
+                    selectionManager.LoadSavedSelections();
+                }
+
+                if (selectionManager.CurrentCharacter != null)
+                {
+                    HandleCurrentCharacterChanged(selectionManager.CurrentCharacter);
+                }
+
                 var selected = new List<CharacterDataSO>();
                 if (selectionManager.Database != null)
                 {
@@ -195,6 +204,10 @@ namespace Clashura.CharacterSelection.UI
                     if (Clashura.UI.Navigation.UINavigationController.Instance != null)
                     {
                         Clashura.UI.Navigation.UINavigationController.Instance.OpenMainMenu();
+                    }
+                    else
+                    {
+                        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
                     }
                 });
             }
@@ -471,6 +484,10 @@ namespace Clashura.CharacterSelection.UI
                         if (Clashura.UI.Navigation.UINavigationController.Instance != null)
                         {
                             Clashura.UI.Navigation.UINavigationController.Instance.OpenMainMenu();
+                        }
+                        else
+                        {
+                            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
                         }
                     });
                     break;

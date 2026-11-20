@@ -52,7 +52,12 @@ namespace Clashura.CharacterSelection.Managers
                 return;
             }
 
-            if (autoLoadOnStart)
+            if (_saveSystem == null)
+            {
+                _saveSystem = new PlayerPrefsSelectionSaveSystem();
+            }
+
+            if (autoLoadOnStart || _selectedCharacterIds.Count == 0)
             {
                 LoadSavedSelections();
             }
@@ -207,11 +212,18 @@ namespace Clashura.CharacterSelection.Managers
             if (_saveSystem == null) return;
             var data = new PlayerSelectionData(localPlayerId, _selectedCharacterIds);
             _saveSystem.SaveSelection(data);
+
+            // Synchronize directly with TeamSelectionManager persistent cache
+            Clashura.Multiplayer.TeamSelectionManager.SaveTeam(_selectedCharacterIds);
         }
 
         public void LoadSavedSelections()
         {
-            if (_saveSystem == null || characterDatabase == null) return;
+            if (_saveSystem == null)
+            {
+                _saveSystem = new PlayerPrefsSelectionSaveSystem();
+            }
+            if (characterDatabase == null) return;
 
             var data = _saveSystem.LoadSelection(localPlayerId);
             _selectedCharacterIds.Clear();
@@ -220,12 +232,13 @@ namespace Clashura.CharacterSelection.Managers
             {
                 foreach (var id in data.SelectedCharacterIds)
                 {
-                    // Validate ID against database
-                    if (characterDatabase.GetCharacterById(id) != null && !_selectedCharacterIds.Contains(id))
+                    // Validate ID against database and normalize to canonical CharacterId
+                    var charData = characterDatabase.GetCharacterById(id);
+                    if (charData != null && !_selectedCharacterIds.Contains(charData.CharacterId))
                     {
                         if (_selectedCharacterIds.Count < RequiredSelectionCount)
                         {
-                            _selectedCharacterIds.Add(id);
+                            _selectedCharacterIds.Add(charData.CharacterId);
                         }
                     }
                 }
