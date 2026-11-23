@@ -16,17 +16,8 @@ namespace Clashura.UI.MainMenu
         [Tooltip("Button 1: Future private multiplayer lobby / room codes (Visual only for now).")]
         [SerializeField] private Button pvpButton;
 
-        [Tooltip("Button: Opens Better with AI game mode.")]
-        [SerializeField] private Button playWithAIButton;
-
         [Tooltip("Button 2: Future worldwide random matchmaking (Visual only for now).")]
         [SerializeField] private Button randomMatchButton;
-
-        public Button PlayWithAIButton
-        {
-            get => playWithAIButton;
-            set => playWithAIButton = value;
-        }
 
         [Tooltip("Button 3: Opens the Character Selection panel.")]
         [SerializeField] private Button characterSelectionButton;
@@ -48,64 +39,6 @@ namespace Clashura.UI.MainMenu
             HookButtons();
         }
 
-        private void Start()
-        {
-            UpdatePlayerBadgeDisplay();
-            if (Clashura.PlayFab.PlayFabAuthService.HasInstance)
-            {
-                Clashura.PlayFab.PlayFabAuthService.Instance.OnProfileLoaded += HandleProfileLoaded;
-            }
-            else if (Application.isPlaying)
-            {
-                var auth = Clashura.PlayFab.PlayFabAuthService.Instance;
-                if (auth != null)
-                {
-                    auth.OnProfileLoaded += HandleProfileLoaded;
-                }
-            }
-        }
-
-        private void OnDestroy()
-        {
-            if (Clashura.PlayFab.PlayFabAuthService.HasInstance)
-            {
-                Clashura.PlayFab.PlayFabAuthService.Instance.OnProfileLoaded -= HandleProfileLoaded;
-            }
-
-            if (playWithAIButton != null)
-            {
-                playWithAIButton.onClick.RemoveListener(OnPlayWithAIClicked);
-            }
-        }
-
-        private void HandleProfileLoaded(Clashura.PlayFab.PlayFabPlayerProfile profile)
-        {
-            UpdatePlayerBadgeDisplay();
-        }
-
-        public void UpdatePlayerBadgeDisplay()
-        {
-            var badgeTitle = GameObject.Find("MasterCanvas/MainMenuPanel/SafeArea/PlayerProfileBadge/Title")?.GetComponent<TextMeshProUGUI>();
-            var badgeValue = GameObject.Find("MasterCanvas/MainMenuPanel/SafeArea/PlayerProfileBadge/Value")?.GetComponent<TextMeshProUGUI>();
-
-            string name = Clashura.PlayFab.PlayFabConfig.DefaultDisplayName;
-            int rating = Clashura.PlayFab.PlayFabConfig.DefaultRating;
-
-            if (Clashura.PlayFab.PlayFabAuthService.HasInstance && Clashura.PlayFab.PlayFabAuthService.Instance.CurrentProfile != null)
-            {
-                name = Clashura.PlayFab.PlayFabAuthService.Instance.CurrentProfile.displayName;
-                rating = Clashura.PlayFab.PlayFabAuthService.Instance.CurrentProfile.rating;
-            }
-            else
-            {
-                name = PlayerPrefs.GetString("CLASHURA_PLAYER_NAME", name);
-                rating = PlayerPrefs.GetInt("CLASHURA_PLAYER_POINTS", rating);
-            }
-
-            if (badgeTitle != null) badgeTitle.text = name.ToUpper();
-            if (badgeValue != null) badgeValue.text = $"Lv. 12  ·  {rating:N0}";
-        }
-
         private void Update()
         {
             if (_feedbackTimer > 0f)
@@ -120,14 +53,16 @@ namespace Clashura.UI.MainMenu
 
         private void HookButtons()
         {
-            // Button 1: PLAYER VS PLAYER is handled by PvPMenuController for 1v1 custom rooms
-            // Button 2: RANDOM MATCH is handled by PvPMenuController for Skill-Based ELO Matchmaking
-            // Both buttons perform team selection validation and route to their respective matchmaking flow.
+            // Button 1: PLAYER VS PLAYER is handled by PvPMenuController for 1v1 Photon Fusion 2 matchmaking
+            // We intentionally do NOT attach placeholder feedback here.
 
-            // New Button: PLAY WITH AI (Opens the BetterWithAI scene)
-            if (playWithAIButton != null)
+            // Button 2: RANDOM MATCH (Visual only for now)
+            if (randomMatchButton != null)
             {
-                playWithAIButton.onClick.AddListener(OnPlayWithAIClicked);
+                randomMatchButton.onClick.AddListener(() =>
+                {
+                    ShowFeedback("Random Match: Matchmaking coming soon!");
+                });
             }
 
             // Button 3: CHARACTER SELECTION (Opens Character Selection panel)
@@ -181,12 +116,6 @@ namespace Clashura.UI.MainMenu
                     }
                 });
             }
-        }
-
-        private void OnPlayWithAIClicked()
-        {
-            Debug.Log("[MainMenuController] 'Play with AI' clicked. Opening AICareerMenu scene...");
-            UnityEngine.SceneManagement.SceneManager.LoadScene("AICareerMenu");
         }
 
         private void ShowFeedback(string message)

@@ -138,24 +138,15 @@ namespace Clashura.Multiplayer
 
         #region Data Population
 
-        private static string GetTierName(int rating)
-        {
-            if (rating >= 1700) return "DIAMOND TIER I";
-            if (rating >= 1400) return "PLATINUM TIER II";
-            if (rating >= 1100) return "GOLD TIER III";
-            if (rating >= 800) return "SILVER TIER II";
-            return "BRONZE TIER I";
-        }
-
         private void PopulatePlayer1(PlayerMatchProfile p1)
         {
             if (p1 == null) p1 = PlayerMatchProfile.CreateLocalProfile(true);
 
             if (p1NameText != null) p1NameText.text = p1.playerName.ToUpper();
             if (p1LevelText != null) p1LevelText.text = $"LVL {p1.playerLevel}";
-            if (p1PointsText != null) p1PointsText.text = $"{p1.playerPoints} ELO";
+            if (p1PointsText != null) p1PointsText.text = $"{p1.playerPoints:N0} PTS";
             if (p1TagText != null) p1TagText.text = "HOST · ARENA CHAMPION";
-            if (p1TierText != null) p1TierText.text = GetTierName(p1.playerPoints);
+            if (p1TierText != null) p1TierText.text = "GOLD TIER III";
 
             PopulateTeam(p1.teamCharacterIds, p1HeroPortraits, p1HeroNames, p1HeroRoles);
         }
@@ -166,9 +157,9 @@ namespace Clashura.Multiplayer
 
             if (p2NameText != null) p2NameText.text = p2.playerName.ToUpper();
             if (p2LevelText != null) p2LevelText.text = $"LVL {p2.playerLevel}";
-            if (p2PointsText != null) p2PointsText.text = $"{p2.playerPoints} ELO";
+            if (p2PointsText != null) p2PointsText.text = $"{p2.playerPoints:N0} PTS";
             if (p2TagText != null) p2TagText.text = "CHALLENGER · RIVAL";
-            if (p2TierText != null) p2TierText.text = GetTierName(p2.playerPoints);
+            if (p2TierText != null) p2TierText.text = "PLATINUM TIER I";
 
             PopulateTeam(p2.teamCharacterIds, p2HeroPortraits, p2HeroNames, p2HeroRoles);
         }

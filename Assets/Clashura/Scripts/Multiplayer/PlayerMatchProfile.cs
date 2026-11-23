@@ -11,13 +11,9 @@ namespace Clashura.Multiplayer
     [Serializable]
     public class PlayerMatchProfile
     {
-        public string playerId = string.Empty;
         public string playerName = "Warrior";
         public int playerLevel = 1;
         public int playerPoints = 1000;
-        public int wins = 0;
-        public int losses = 0;
-        public string currentMatchId = string.Empty;
         public List<string> teamCharacterIds = new List<string>();
 
         public PlayerMatchProfile()
@@ -33,40 +29,14 @@ namespace Clashura.Multiplayer
         }
 
         /// <summary>
-        /// Creates a profile representing the local player from persistent settings, database ELO, and team selection.
+        /// Creates a profile representing the local player from persistent settings and team selection.
         /// </summary>
         public static PlayerMatchProfile CreateLocalProfile(bool isHost = true)
         {
-            string id = isHost ? "Host_01" : "Client_02";
-            string defaultName = isHost ? PlayFab.PlayFabConfig.DefaultDisplayName : "Player 2";
+            string defaultName = isHost ? "Player 1" : "Player 2";
             string name = PlayerPrefs.GetString("CLASHURA_PLAYER_NAME", defaultName);
-            int points = PlayFab.PlayFabConfig.DefaultRating;
-            int wins = 0;
-            int losses = 0;
-
-            if (PlayFab.PlayFabAuthService.HasInstance && PlayFab.PlayFabAuthService.Instance.CurrentProfile != null)
-            {
-                var pf = PlayFab.PlayFabAuthService.Instance.CurrentProfile;
-                id = pf.playFabId;
-                name = pf.displayName;
-                points = pf.rating;
-                wins = pf.wins;
-                losses = pf.losses;
-            }
-            else if (Elo.EloManager.Instance != null && Elo.EloManager.Instance.CurrentProfile != null)
-            {
-                id = Elo.EloManager.Instance.GetLocalPlayerId();
-                name = Elo.EloManager.Instance.GetLocalPlayerName();
-                points = Elo.EloManager.Instance.CurrentProfile.rating;
-                wins = Elo.EloManager.Instance.CurrentProfile.wins;
-                losses = Elo.EloManager.Instance.CurrentProfile.losses;
-            }
-            else
-            {
-                points = PlayerPrefs.GetInt("CLASHURA_PLAYER_POINTS", 1000);
-            }
-
             int level = PlayerPrefs.GetInt("CLASHURA_PLAYER_LEVEL", isHost ? 25 : 28);
+            int points = PlayerPrefs.GetInt("CLASHURA_PLAYER_POINTS", isHost ? 1450 : 1520);
 
             var team = TeamSelectionManager.GetSelectedTeam();
             if (team == null || team.Count == 0)
@@ -77,18 +47,7 @@ namespace Clashura.Multiplayer
                     : new List<string> { "clashura_char_04", "clashura_char_05", "clashura_char_06" };
             }
 
-            var profile = new PlayerMatchProfile(name, level, points, team);
-            profile.playerId = id;
-            if (Elo.EloManager.Instance != null && Elo.EloManager.Instance.CurrentProfile != null)
-            {
-                profile.wins = Elo.EloManager.Instance.CurrentProfile.wins;
-                profile.losses = Elo.EloManager.Instance.CurrentProfile.losses;
-            }
-            if (Elo.EloManager.Instance != null)
-            {
-                profile.currentMatchId = Elo.EloManager.Instance.CurrentMatchId;
-            }
-            return profile;
+            return new PlayerMatchProfile(name, level, points, team);
         }
 
         /// <summary>
