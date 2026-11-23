@@ -19,6 +19,17 @@ namespace Clashura.Multiplayer
     }
 
     /// <summary>
+    /// Entry mode determined by Main Menu button selection:
+    /// - CustomRooms: Player vs Player button -> 1v1 Custom Room lobby (Create Room / Search Room by custom code).
+    /// - RandomMatch: Random Match button -> Skill-Based ELO Matchmaking queue.
+    /// </summary>
+    public enum MatchmakingEntryMode
+    {
+        CustomRooms,
+        RandomMatch
+    }
+
+    /// <summary>
     /// Master coordinator for 1v1 Player vs Player Matchmaking.
     /// Drives room creation, session searching, opponent discovery, and gameplay scene transitions.
     /// </summary>
@@ -27,12 +38,40 @@ namespace Clashura.Multiplayer
         private static MatchmakingManager _instance;
         private static bool _isShuttingDown = false;
 
+        /// <summary>
+        /// Global entry mode set by Main Menu (CustomRooms vs RandomMatch).
+        /// </summary>
+        public static MatchmakingEntryMode EntryMode { get; set; } = MatchmakingEntryMode.CustomRooms;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
         {
             _isShuttingDown = false;
             _instance = null;
+            EntryMode = MatchmakingEntryMode.CustomRooms;
         }
+
+#if UNITY_EDITOR
+        [UnityEditor.InitializeOnLoadMethod]
+        private static void RegisterEditorLifecycle()
+        {
+            UnityEditor.EditorApplication.playModeStateChanged += state =>
+            {
+                if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode ||
+                    state == UnityEditor.PlayModeStateChange.ExitingEditMode)
+                {
+                    _isShuttingDown = true;
+                }
+                else if (state == UnityEditor.PlayModeStateChange.EnteredPlayMode ||
+                         state == UnityEditor.PlayModeStateChange.EnteredEditMode)
+                {
+                    _isShuttingDown = false;
+                }
+            };
+        }
+#endif
+
+        public static bool HasInstance => _instance != null && !_isShuttingDown;
 
         public static MatchmakingManager Instance
         {
@@ -206,10 +245,16 @@ namespace Clashura.Multiplayer
         #region Search Match Flow
 
         /// <summary>
-        /// Initiates search for room by specific name chosen by client, or open rooms (< 2 players) and joins.
+        /// Initiates search for room by specific name chosen by client, or runs ELO Skill-Based Matchmaking if empty.
         /// </summary>
         public void SearchMatch(string targetRoomName = null)
         {
+            if (string.IsNullOrWhiteSpace(targetRoomName))
+            {
+                StartEloSkillMatchmaking();
+                return;
+            }
+
             if (IsBusy)
             {
                 Debug.LogWarning("[MatchmakingManager] Matchmaking already in progress. Ignoring duplicate click.");
@@ -221,6 +266,146 @@ namespace Clashura.Multiplayer
                 StopCoroutine(_searchCoroutine);
             }
             _searchCoroutine = StartCoroutine(SearchMatchRoutine(targetRoomName));
+        }
+
+        /// <summary>
+        /// Initiates Skill-Based Matchmaking using the standard ELO rating algorithm.
+        /// Evaluates database ratings, applies dynamic range expansion (±50 -> ±100 -> ±150),
+        /// pairs players authoritatively, and binds to Photon Fusion 2 session.
+        /// </summary>
+        public void StartEloSkillMatchmaking()
+        {
+            if (IsBusy)
+            {
+                Debug.LogWarning("[MatchmakingManager] Matchmaking already in progress. Ignoring duplicate click.");
+                return;
+            }
+
+            if (_searchCoroutine != null)
+            {
+                StopCoroutine(_searchCoroutine);
+            }
+            _searchCoroutine = StartCoroutine(EloSkillMatchmakingRoutine());
+        }
+
+        private IEnumerator EloSkillMatchmakingRoutine()
+        {
+            SetState(MatchmakingState.Connecting, MsgConnecting);
+
+            // 1. Connect to Photon Fusion 2 Cloud
+            bool connectSuccess = false;
+            string connectErr = string.Empty;
+
+            PhotonFusionManager.Instance.ConnectToPhoton((success, error) =>
+            {
+                connectSuccess = success;
+                connectErr = error;
+            });
+
+            yield return new WaitUntil(() => PhotonFusionManager.Instance.IsConnected || !string.IsNullOrEmpty(connectErr));
+
+            if (!connectSuccess && !PhotonFusionManager.Instance.IsConnected)
+            {
+                SetState(MatchmakingState.Failed, MsgConnectionFailed);
+                yield break;
+            }
+
+            // 2. Authenticate through PlayFab
+            var auth = PlayFab.PlayFabAuthService.Instance;
+            if (!auth.IsAuthenticated || auth.CurrentProfile == null)
+            {
+                bool authComplete = false;
+                auth.Authenticate((success, profile) =>
+                {
+                    authComplete = true;
+                });
+
+                yield return new WaitUntil(() => authComplete);
+            }
+
+            var profile = auth.CurrentProfile;
+            int myRating = profile != null ? profile.rating : 1000;
+            string myName = profile != null ? profile.displayName : "Player";
+
+            string initialStatus = $"Searching for Opponent...\nYour Name: {myName} · Rating: {myRating} ELO (±50)\nPlayers in Queue: 1";
+            SetState(MatchmakingState.SearchingOpponent, initialStatus);
+
+            // 3. Submit Matchmaking Ticket to Global Real-Time Matchmaking Queue
+            var client = PlayFab.PlayFabMatchmakingClient.Instance;
+            bool matchComplete = false;
+            bool matchFailed = false;
+            string failReason = string.Empty;
+            PlayFab.MatchmakingTicketDto matchedTicket = null;
+
+            Action<PlayFab.MatchmakingTicketDto> onUpdated = (ticket) =>
+            {
+                if (currentState == MatchmakingState.SearchingOpponent)
+                {
+                    SetState(MatchmakingState.SearchingOpponent,
+                        $"Searching for Opponent...\nYour Name: {myName} · Rating: {myRating} ELO (±{ticket.currentSearchRadius})\nPlayers in Queue: {ticket.playersInQueue}");
+                }
+            };
+
+            Action<PlayFab.MatchmakingTicketDto> onMatched = (ticket) =>
+            {
+                matchedTicket = ticket;
+                matchComplete = true;
+            };
+
+            client.OnTicketUpdated += onUpdated;
+            client.StartMatchmaking(onMatched);
+
+            yield return new WaitUntil(() => matchComplete || matchFailed || currentState != MatchmakingState.SearchingOpponent);
+
+            client.OnTicketUpdated -= onUpdated;
+
+            if (matchFailed || currentState != MatchmakingState.SearchingOpponent && !matchComplete)
+            {
+                if (matchFailed)
+                {
+                    SetState(MatchmakingState.Failed, string.IsNullOrEmpty(failReason) ? MsgConnectionFailed : failReason);
+                }
+                yield break;
+            }
+
+            if (matchedTicket != null)
+            {
+                // Step 1: Opponent Found!
+                string foundMsg = $"Opponent Found!\nOpponent: {matchedTicket.matchedOpponentName} (Rating: {matchedTicket.matchedOpponentRating} ELO)\nConnecting to Match...";
+                SetState(MatchmakingState.OpponentFound, foundMsg);
+                yield return new WaitForSeconds(0.8f);
+
+                // Step 2: Joining / Creating Room
+                SetState(MatchmakingState.JoiningRoom, "Connecting to Match...");
+
+                bool sessionReady = false;
+                string sessionErr = string.Empty;
+
+                if (matchedTicket.isHost)
+                {
+                    // Host creates the matched Fusion 2 session
+                    PhotonFusionManager.Instance.CreateSession(matchedTicket.sessionName, (success, err) =>
+                    {
+                        sessionReady = success;
+                        sessionErr = err;
+                    });
+                }
+                else
+                {
+                    // Client joins the matched Fusion 2 session (allowing brief delay for host creation)
+                    yield return new WaitForSeconds(0.4f);
+                    PhotonFusionManager.Instance.SearchAndJoinSession(matchedTicket.sessionName, (success, err) =>
+                    {
+                        sessionReady = success;
+                        sessionErr = err;
+                    });
+                }
+
+                yield return new WaitUntil(() => sessionReady || !string.IsNullOrEmpty(sessionErr) || PhotonFusionManager.Instance.CurrentPlayerCount >= 2);
+
+                // Step 3: Match Starting
+                HandleMatchReady();
+            }
         }
 
         private IEnumerator SearchMatchRoutine(string targetRoomName)
@@ -351,7 +536,18 @@ namespace Clashura.Multiplayer
             }
 
             _isTransitioning = false;
-            PhotonFusionManager.Instance.LeaveSession();
+            if (PlayFab.PlayFabMatchmakingClient.HasInstance)
+            {
+                PlayFab.PlayFabMatchmakingClient.Instance.CancelMatchmaking();
+            }
+            if (Elo.EloManager.Instance != null)
+            {
+                Elo.EloManager.Instance.CancelMatchmaking();
+            }
+            if (PhotonFusionManager.Instance != null)
+            {
+                PhotonFusionManager.Instance.LeaveSession();
+            }
             SetState(MatchmakingState.Idle, string.Empty);
             Debug.Log("[MatchmakingManager] Matchmaking canceled by player.");
         }

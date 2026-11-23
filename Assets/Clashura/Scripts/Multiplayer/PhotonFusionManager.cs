@@ -16,12 +16,34 @@ namespace Clashura.Multiplayer
         private static PhotonFusionManager _instance;
         private static bool _isShuttingDown = false;
 
+        public static bool HasInstance => _instance != null && !_isShuttingDown;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
         {
             _isShuttingDown = false;
             _instance = null;
         }
+
+#if UNITY_EDITOR
+        [UnityEditor.InitializeOnLoadMethod]
+        private static void RegisterEditorLifecycle()
+        {
+            UnityEditor.EditorApplication.playModeStateChanged += state =>
+            {
+                if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode ||
+                    state == UnityEditor.PlayModeStateChange.ExitingEditMode)
+                {
+                    _isShuttingDown = true;
+                }
+                else if (state == UnityEditor.PlayModeStateChange.EnteredPlayMode ||
+                         state == UnityEditor.PlayModeStateChange.EnteredEditMode)
+                {
+                    _isShuttingDown = false;
+                }
+            };
+        }
+#endif
 
         public static PhotonFusionManager Instance
         {
@@ -103,6 +125,7 @@ namespace Clashura.Multiplayer
             public int clientPlayerLevel;
             public int clientPlayerPoints;
             public string clientTeamIds;
+            public string matchId;
 
             public bool IsExpired => (DateTime.UtcNow.Ticks - lastHeartbeatTicks) > TimeSpan.FromSeconds(6).Ticks;
         }
@@ -378,7 +401,8 @@ namespace Clashura.Multiplayer
                 hostPlayerName = localProfile.playerName,
                 hostPlayerLevel = localProfile.playerLevel,
                 hostPlayerPoints = localProfile.playerPoints,
-                hostTeamIds = teamStr
+                hostTeamIds = teamStr,
+                matchId = localProfile.currentMatchId
             };
 
             SaveRoomFile(_currentSessionData);
@@ -528,6 +552,10 @@ namespace Clashura.Multiplayer
             targetRoom.clientPlayerLevel = clientProfile.playerLevel;
             targetRoom.clientPlayerPoints = clientProfile.playerPoints;
             targetRoom.clientTeamIds = clientTeamStr;
+            if (!string.IsNullOrEmpty(clientProfile.currentMatchId))
+            {
+                targetRoom.matchId = clientProfile.currentMatchId;
+            }
             SaveRoomFile(targetRoom);
 
             _currentSessionData = targetRoom;
@@ -625,12 +653,14 @@ namespace Clashura.Multiplayer
             var team = new List<string>(_currentSessionData.hostTeamIds?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>());
             if (team.Count == 0) team = PlayerMatchProfile.CreateLocalProfile(true).teamCharacterIds;
 
-            return new PlayerMatchProfile(
+            var p1 = new PlayerMatchProfile(
                 _currentSessionData.hostPlayerName,
                 _currentSessionData.hostPlayerLevel > 0 ? _currentSessionData.hostPlayerLevel : 25,
-                _currentSessionData.hostPlayerPoints > 0 ? _currentSessionData.hostPlayerPoints : 1450,
+                _currentSessionData.hostPlayerPoints > 0 ? _currentSessionData.hostPlayerPoints : 1000,
                 team
             );
+            p1.currentMatchId = _currentSessionData.matchId;
+            return p1;
         }
 
         /// <summary>
@@ -646,12 +676,14 @@ namespace Clashura.Multiplayer
             var team = new List<string>(_currentSessionData.clientTeamIds?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>());
             if (team.Count == 0) team = PlayerMatchProfile.CreateRivalPreviewProfile().teamCharacterIds;
 
-            return new PlayerMatchProfile(
+            var p2 = new PlayerMatchProfile(
                 _currentSessionData.clientPlayerName,
                 _currentSessionData.clientPlayerLevel > 0 ? _currentSessionData.clientPlayerLevel : 28,
-                _currentSessionData.clientPlayerPoints > 0 ? _currentSessionData.clientPlayerPoints : 1520,
+                _currentSessionData.clientPlayerPoints > 0 ? _currentSessionData.clientPlayerPoints : 1000,
                 team
             );
+            p2.currentMatchId = _currentSessionData.matchId;
+            return p2;
         }
 
         #endregion

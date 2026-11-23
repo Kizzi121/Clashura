@@ -17,12 +17,34 @@ namespace Clashura.Multiplayer
         private static TeamSelectionManager _instance;
         private static bool _isShuttingDown = false;
 
+        public static bool HasInstance => _instance != null && !_isShuttingDown;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
         {
             _isShuttingDown = false;
             _instance = null;
         }
+
+#if UNITY_EDITOR
+        [UnityEditor.InitializeOnLoadMethod]
+        private static void RegisterEditorLifecycle()
+        {
+            UnityEditor.EditorApplication.playModeStateChanged += state =>
+            {
+                if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode ||
+                    state == UnityEditor.PlayModeStateChange.ExitingEditMode)
+                {
+                    _isShuttingDown = true;
+                }
+                else if (state == UnityEditor.PlayModeStateChange.EnteredPlayMode ||
+                         state == UnityEditor.PlayModeStateChange.EnteredEditMode)
+                {
+                    _isShuttingDown = false;
+                }
+            };
+        }
+#endif
 
         public static TeamSelectionManager Instance
         {

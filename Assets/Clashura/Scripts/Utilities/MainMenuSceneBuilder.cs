@@ -35,6 +35,7 @@ namespace Clashura.Utilities
         private const string PrefabDir = "Assets/Clashura/Prefabs/UI/MainMenu";
         private const string ArtDir = "Assets/Clashura/Art/UI/MainMenu";
         private const string SettingsArtDir = "Assets/Clashura/Art/UI/Settings";
+        private const string AIArtDir = "Assets/Clashura/Art/UI/AI";
         private const string FontPath = "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset";
 
         private static TMP_FontAsset _cachedFont;
@@ -56,6 +57,7 @@ namespace Clashura.Utilities
             // 1. Ensure original art assets exist
             MainMenuArtGenerator.GenerateAllArt();
             SettingsArtGenerator.GenerateAllArt();
+            AIArtGenerator.GenerateAllAIArt();
 
             // 2. Assign high-resolution themed archetype icons to ability data assets
             AssignThemedAbilityIcons();
@@ -278,17 +280,18 @@ namespace Clashura.Utilities
             bcRect.anchorMin = new Vector2(0.5f, 0.365f);
             bcRect.anchorMax = new Vector2(0.5f, 0.365f);
             bcRect.pivot = new Vector2(0.5f, 0.5f);
-            bcRect.sizeDelta = new Vector2(660, 480);
+            bcRect.sizeDelta = new Vector2(660, 520);
             bcRect.anchoredPosition = Vector2.zero;
 
             var vlg = btnContainer.GetComponent<VerticalLayoutGroup>();
-            vlg.spacing = 10;
+            vlg.spacing = 8;
             vlg.childAlignment = TextAnchor.MiddleCenter;
             vlg.childControlWidth = true;
             vlg.childControlHeight = false;
 
-            // 5 Original Modular Animated Buttons
+            // Modular Animated Buttons
             var btnPvp = CreateModularMenuButton(btnContainer.transform, "Btn_PvP", "PLAYER VS PLAYER", "1v1, 2v2 & More", $"{ArtDir}/Icon_PvP.png", false);
+            var btnAi = CreateModularMenuButton(btnContainer.transform, "Btn_PlayWithAI", "PLAY WITH AI", "Novice, Medium & Hard", $"{AIArtDir}/Icon_PlayWithAI.png", false);
             var btnRandom = CreateModularMenuButton(btnContainer.transform, "Btn_RandomMatch", "RANDOM MATCH", "Quick Match (Auto-Balanced)", $"{ArtDir}/Icon_RandomMatch.png", false);
             var btnCharSelect = CreateModularMenuButton(btnContainer.transform, "Btn_CharacterSelection", "CHARACTER SELECTION", "Choose Your Hero", $"{ArtDir}/Icon_CharSelect.png", true);
             var btnSettings = CreateModularMenuButton(btnContainer.transform, "Btn_Settings", "SETTINGS", "Audio & Controls", $"{ArtDir}/Icon_Settings.png", false);
@@ -327,6 +330,7 @@ namespace Clashura.Utilities
             // Wire MainMenuController Serialized Properties
             var ctrlSO = new SerializedObject(controller);
             ctrlSO.FindProperty("pvpButton").objectReferenceValue = btnPvp;
+            ctrlSO.FindProperty("playWithAIButton").objectReferenceValue = btnAi;
             ctrlSO.FindProperty("randomMatchButton").objectReferenceValue = btnRandom;
             ctrlSO.FindProperty("characterSelectionButton").objectReferenceValue = btnCharSelect;
             ctrlSO.FindProperty("settingsButton").objectReferenceValue = btnSettings;
@@ -472,7 +476,7 @@ namespace Clashura.Utilities
 
             var le = btnObj.GetComponent<LayoutElement>();
             le.preferredWidth = 650;
-            le.preferredHeight = 86;
+            le.preferredHeight = 76;
 
             var img = btnObj.GetComponent<Image>();
             string normPath = pulse ? $"{ArtDir}/UI_Button_Highlight.png" : $"{ArtDir}/UI_Button_Normal.png";
@@ -496,18 +500,18 @@ namespace Clashura.Utilities
             iRect.anchorMin = new Vector2(0, 0.5f);
             iRect.anchorMax = new Vector2(0, 0.5f);
             iRect.pivot = new Vector2(0, 0.5f);
-            iRect.sizeDelta = new Vector2(50, 50);
+            iRect.sizeDelta = new Vector2(46, 46);
             iRect.anchoredPosition = new Vector2(28, 0);
             var iImg = iconObj.GetComponent<Image>();
             iImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(iconPath);
             iImg.preserveAspect = true;
 
             // 2. Primary Text
-            var primTmp = CreateTMPText(btnObj.transform, "PrimaryText", primaryText, 26, FontStyles.Bold, Color.white, 0.15f, 0.48f, 0.85f, 0.94f);
+            var primTmp = CreateTMPText(btnObj.transform, "PrimaryText", primaryText, 24, FontStyles.Bold, Color.white, 0.15f, 0.48f, 0.85f, 0.94f);
             primTmp.alignment = TextAlignmentOptions.Left;
 
             // 3. Subtitle Text
-            var subTmp = CreateTMPText(btnObj.transform, "SubText", subText, 17, FontStyles.Normal, new Color(0.72f, 0.84f, 0.98f, 0.95f), 0.15f, 0.10f, 0.85f, 0.48f);
+            var subTmp = CreateTMPText(btnObj.transform, "SubText", subText, 15, FontStyles.Normal, new Color(0.72f, 0.84f, 0.98f, 0.95f), 0.15f, 0.10f, 0.85f, 0.48f);
             subTmp.alignment = TextAlignmentOptions.Left;
 
             // 4. Chevron (Right)
