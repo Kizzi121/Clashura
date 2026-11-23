@@ -275,7 +275,11 @@ namespace Clashura.Utilities
             ctrlSO.FindProperty("hardCardRect").objectReferenceValue = hardCardRect;
 
             ctrlSO.FindProperty("statusTitleText").objectReferenceValue = statusTitleTmp;
-            ctrlSO.FindProperty("mainMenuSceneName").stringValue = "MainMenu";
+            var careerSceneProp = ctrlSO.FindProperty("careerMenuSceneName");
+            if (careerSceneProp != null)
+            {
+                careerSceneProp.stringValue = "AICareerMenu";
+            }
             ctrlSO.ApplyModifiedProperties();
         }
 

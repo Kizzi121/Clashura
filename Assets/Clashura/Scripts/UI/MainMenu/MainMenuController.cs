@@ -16,6 +16,15 @@ namespace Clashura.UI.MainMenu
         [Tooltip("Button 1: Future private multiplayer lobby / room codes (Visual only for now).")]
         [SerializeField] private Button pvpButton;
 
+        [Tooltip("Button: Opens Better with AI / AI Career mode.")]
+        [SerializeField] private Button playWithAIButton;
+
+        public Button PlayWithAIButton
+        {
+            get => playWithAIButton;
+            set => playWithAIButton = value;
+        }
+
         [Tooltip("Button 2: Future worldwide random matchmaking (Visual only for now).")]
         [SerializeField] private Button randomMatchButton;
 
@@ -39,6 +48,14 @@ namespace Clashura.UI.MainMenu
             HookButtons();
         }
 
+        private void OnDestroy()
+        {
+            if (playWithAIButton != null)
+            {
+                playWithAIButton.onClick.RemoveListener(OnPlayWithAIClicked);
+            }
+        }
+
         private void Update()
         {
             if (_feedbackTimer > 0f)
@@ -55,6 +72,12 @@ namespace Clashura.UI.MainMenu
         {
             // Button 1: PLAYER VS PLAYER is handled by PvPMenuController for 1v1 Photon Fusion 2 matchmaking
             // We intentionally do NOT attach placeholder feedback here.
+
+            // New Button: PLAY WITH AI (Opens AI Career Menu)
+            if (playWithAIButton != null)
+            {
+                playWithAIButton.onClick.AddListener(OnPlayWithAIClicked);
+            }
 
             // Button 2: RANDOM MATCH (Visual only for now)
             if (randomMatchButton != null)
@@ -116,6 +139,12 @@ namespace Clashura.UI.MainMenu
                     }
                 });
             }
+        }
+
+        private void OnPlayWithAIClicked()
+        {
+            Debug.Log("[MainMenuController] 'Play with AI' clicked. Opening AICareerMenu scene...");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("AICareerMenu");
         }
 
         private void ShowFeedback(string message)
