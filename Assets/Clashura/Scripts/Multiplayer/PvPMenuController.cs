@@ -13,8 +13,23 @@ namespace Clashura.Multiplayer
     public class PvPMenuController : MonoBehaviour
     {
         [Header("Main Menu Controls")]
-        [Tooltip("The 'Player vs Player' button on the Main Menu.")]
+        [Tooltip("The 'Player vs Player' button on the Main Menu (Custom Rooms).")]
         [SerializeField] private Button pvpButton;
+
+        [Tooltip("The 'Random Match' button on the Main Menu (Skill-Based ELO Matchmaking).")]
+        [SerializeField] private Button randomMatchButton;
+
+        public Button PvpButton
+        {
+            get => pvpButton;
+            set => pvpButton = value;
+        }
+
+        public Button RandomMatchButton
+        {
+            get => randomMatchButton;
+            set => randomMatchButton = value;
+        }
 
         [Header("Team Selection Warning Panel")]
         [Tooltip("The warning panel displayed when no team is selected.")]
@@ -26,6 +41,10 @@ namespace Clashura.Multiplayer
         [Tooltip("The single action button to go to Character Selection.")]
         [SerializeField] private Button goToCharacterSelectionButton;
 
+        public GameObject WarningPanel => teamWarningPanel;
+        public TextMeshProUGUI WarningText => warningMessageText;
+        public Button GoToCharacterSelectionButton => goToCharacterSelectionButton;
+
         [Header("Scene Configuration")]
         [SerializeField] private string matchmakingSceneName = "PvP_Matchmaking";
         [SerializeField] private string characterSelectionSceneName = "CharacterSelection";
@@ -34,6 +53,18 @@ namespace Clashura.Multiplayer
 
         private void Awake()
         {
+            if (pvpButton == null)
+            {
+                var pvpGo = GameObject.Find("Btn_PvP");
+                if (pvpGo != null) pvpButton = pvpGo.GetComponent<Button>();
+            }
+
+            if (randomMatchButton == null)
+            {
+                var randomGo = GameObject.Find("Btn_RandomMatch");
+                if (randomGo != null) randomMatchButton = randomGo.GetComponent<Button>();
+            }
+
             if (teamWarningPanel != null)
             {
                 teamWarningPanel.SetActive(false);
@@ -42,6 +73,11 @@ namespace Clashura.Multiplayer
             if (pvpButton != null)
             {
                 pvpButton.onClick.AddListener(OnPlayerVsPlayerClicked);
+            }
+
+            if (randomMatchButton != null)
+            {
+                randomMatchButton.onClick.AddListener(OnRandomMatchClicked);
             }
 
             if (goToCharacterSelectionButton != null)
@@ -57,6 +93,11 @@ namespace Clashura.Multiplayer
                 pvpButton.onClick.RemoveListener(OnPlayerVsPlayerClicked);
             }
 
+            if (randomMatchButton != null)
+            {
+                randomMatchButton.onClick.RemoveListener(OnRandomMatchClicked);
+            }
+
             if (goToCharacterSelectionButton != null)
             {
                 goToCharacterSelectionButton.onClick.RemoveListener(OnGoToCharacterSelectionClicked);
@@ -65,6 +106,7 @@ namespace Clashura.Multiplayer
 
         /// <summary>
         /// Triggered when the player clicks "Player vs Player".
+        /// Opens Custom 1v1 Rooms mode (Host / Search by custom room code).
         /// </summary>
         public void OnPlayerVsPlayerClicked()
         {
@@ -72,12 +114,30 @@ namespace Clashura.Multiplayer
 
             if (!hasTeam)
             {
-                // Show Warning Panel immediately
                 ShowWarningPanel();
             }
             else
             {
-                // Team is selected -> load PvP_Matchmaking scene
+                MatchmakingManager.EntryMode = MatchmakingEntryMode.CustomRooms;
+                LoadMatchmakingScene();
+            }
+        }
+
+        /// <summary>
+        /// Triggered when the player clicks "Random Match".
+        /// Opens Skill-Based ELO Matchmaking mode (±50 -> ±100 -> ±150).
+        /// </summary>
+        public void OnRandomMatchClicked()
+        {
+            bool hasTeam = TeamSelectionManager.HasSelectedTeam();
+
+            if (!hasTeam)
+            {
+                ShowWarningPanel();
+            }
+            else
+            {
+                MatchmakingManager.EntryMode = MatchmakingEntryMode.RandomMatch;
                 LoadMatchmakingScene();
             }
         }
@@ -112,7 +172,7 @@ namespace Clashura.Multiplayer
             {
                 UINavigationController.Instance.OpenCharacterSelection();
             }
-            else
+            else if (Application.isPlaying)
             {
                 // Otherwise load the dedicated CharacterSelection scene
                 SceneManager.LoadScene(characterSelectionSceneName);
@@ -129,7 +189,10 @@ namespace Clashura.Multiplayer
             }
 
             Debug.Log($"[PvPMenuController] Team check passed. Loading scene: '{matchmakingSceneName}'.");
-            SceneManager.LoadScene(matchmakingSceneName);
+            if (Application.isPlaying)
+            {
+                SceneManager.LoadScene(matchmakingSceneName);
+            }
         }
     }
 }

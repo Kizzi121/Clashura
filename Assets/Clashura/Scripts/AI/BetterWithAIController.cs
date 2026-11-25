@@ -29,6 +29,11 @@ namespace Clashura.AI
         [Tooltip("Back to Main Menu button.")]
         [SerializeField] private Button backButton;
 
+        public Button BackButton => backButton;
+        public Button EasyButton => easyButton;
+        public Button MediumButton => mediumButton;
+        public Button HardButton => hardButton;
+
         [Header("Difficulty Buttons (Vertical Hierarchy)")]
         [SerializeField] private Button easyButton;
         [SerializeField] private Button mediumButton;
@@ -145,14 +150,31 @@ namespace Clashura.AI
 
         private IEnumerator TransitionToVersusRoutine(AIDifficulty difficulty)
         {
-            yield return new WaitForSeconds(0.25f);
-            AICareerManager.Instance.StartNewCareerWithDifficulty(difficulty);
+            yield return new WaitForSeconds(0.20f);
+            if (AICareerMasterUI.Instance != null)
+            {
+                Debug.Log($"[BetterWithAIController] Transitioning to Versus screen panel with {difficulty}...");
+                AICareerManager.Instance.PrepareNewCareerData(difficulty);
+                AICareerMasterUI.Instance.ShowVersusScreen(difficulty);
+            }
+            else
+            {
+                AICareerManager.Instance.StartNewCareerWithDifficulty(difficulty);
+            }
         }
 
         public void OnBackClicked()
         {
-            Debug.Log($"[BetterWithAIController] Returning to {careerMenuSceneName}...");
-            SceneManager.LoadScene(careerMenuSceneName);
+            if (AICareerMasterUI.Instance != null)
+            {
+                Debug.Log("[BetterWithAIController] Returning to Career Menu panel...");
+                AICareerMasterUI.Instance.ShowCareerMenu();
+            }
+            else if (Application.isPlaying)
+            {
+                Debug.Log($"[BetterWithAIController] Returning to {careerMenuSceneName}...");
+                SceneManager.LoadScene(careerMenuSceneName);
+            }
         }
 
         #endregion

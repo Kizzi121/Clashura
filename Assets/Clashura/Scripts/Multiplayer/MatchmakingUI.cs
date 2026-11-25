@@ -47,6 +47,17 @@ namespace Clashura.Multiplayer
         [SerializeField] private Button cancelButton;
         [SerializeField] private Button backToMenuButton;
 
+        public Button ChooseCreateButton => chooseCreateButton;
+        public Button ChooseSearchButton => chooseSearchButton;
+        public Button HostRoomActionButton => hostRoomActionButton;
+        public Button BackFromCreateButton => backFromCreateButton;
+        public Button JoinRoomActionButton => joinRoomActionButton;
+        public Button BackFromSearchButton => backFromSearchButton;
+        public Button CancelButton => cancelButton;
+        public Button BackToMenuButton => backToMenuButton;
+        public Image LoadingSpinnerIcon => loadingSpinnerIcon;
+        public VersusMatchupUI VersusUI => versusMatchupUI;
+
         [Header("Versus Matchup Screen")]
         [Tooltip("The dramatic Versus Matchup panel that displays both players and selected teams")]
         [SerializeField] private VersusMatchupUI versusMatchupUI;
@@ -58,13 +69,32 @@ namespace Clashura.Multiplayer
         [SerializeField] private Image loadingSpinnerIcon;
         [SerializeField] private float spinnerSpeed = 240f;
 
+        [Header("Rating & Queue Information")]
+        [Tooltip("Displays authenticated player rating and real-time players in queue")]
+        [SerializeField] private TextMeshProUGUI playerRatingBadgeText;
+
+        [Header("Cancel Confirmation Modal")]
+        [Tooltip("The confirmation panel that prompts user when leaving/canceling matchmaking.")]
+        [SerializeField] private GameObject cancelConfirmationPanel;
+        [SerializeField] private TextMeshProUGUI cancelConfirmationPromptText;
+        [SerializeField] private Button cancelConfirmYesButton;
+        [SerializeField] private Button cancelConfirmNoButton;
+
+        public GameObject CancelConfirmationPanel => cancelConfirmationPanel;
+        public TextMeshProUGUI CancelConfirmationPromptText => cancelConfirmationPromptText;
+        public Button CancelConfirmYesButton => cancelConfirmYesButton;
+        public Button CancelConfirmNoButton => cancelConfirmNoButton;
+
         [Header("Scene Navigation")]
         [SerializeField] private string mainMenuSceneName = "MainMenu";
 
         private bool _isSubscribed = false;
+        private float _searchDurationRemaining = 120f;
+        private bool _isCountdownActive = false;
 
         private void Awake()
         {
+            EnsureRatingBadge();
             HookButtons();
         }
 
@@ -81,31 +111,163 @@ namespace Clashura.Multiplayer
         private void Start()
         {
             SubscribeManagerEvents();
-            ShowModeSelection();
+
+            if (MatchmakingManager.EntryMode == MatchmakingEntryMode.RandomMatch)
+            {
+                StartRandomEloMatchmaking();
+            }
+            else
+            {
+                ShowModeSelection();
+            }
+        }
+
+        private void EnsureRatingBadge()
+        {
+            if (playerRatingBadgeText != null) return;
+
+            var existing = GameObject.Find("PlayerRatingBadge");
+            if (existing != null)
+            {
+                playerRatingBadgeText = existing.GetComponent<TextMeshProUGUI>();
+                return;
+            }
+
+            if (subtitleText != null && subtitleText.transform.parent != null)
+            {
+                GameObject badgeGo = new GameObject("PlayerRatingBadge", typeof(RectTransform), typeof(TextMeshProUGUI));
+                badgeGo.transform.SetParent(subtitleText.transform.parent, false);
+                var rt = badgeGo.GetComponent<RectTransform>();
+                rt.anchorMin = subtitleText.rectTransform.anchorMin;
+                rt.anchorMax = subtitleText.rectTransform.anchorMax;
+                rt.pivot = subtitleText.rectTransform.pivot;
+                rt.anchoredPosition = subtitleText.rectTransform.anchoredPosition + new Vector2(0f, -38f);
+                rt.sizeDelta = new Vector2(800f, 36f);
+
+                playerRatingBadgeText = badgeGo.GetComponent<TextMeshProUGUI>();
+                playerRatingBadgeText.fontSize = 20f;
+                playerRatingBadgeText.fontStyle = FontStyles.Bold;
+                playerRatingBadgeText.alignment = TextAlignmentOptions.Center;
+                playerRatingBadgeText.color = new Color(0.95f, 0.82f, 0.35f, 1f); // Gold
+            }
         }
 
         private void SubscribeManagerEvents()
         {
             if (_isSubscribed) return;
-            if (MatchmakingManager.Instance != null)
+            if (MatchmakingManager.HasInstance)
             {
                 MatchmakingManager.Instance.OnStateChanged += HandleStateChanged;
                 MatchmakingManager.Instance.OnStatusMessageChanged += HandleStatusMessageChanged;
                 MatchmakingManager.Instance.OnRoomCreated += HandleRoomCreated;
                 _isSubscribed = true;
             }
+
+            if (PlayFab.PlayFabAuthService.HasInstance)
+            {
+                PlayFab.PlayFabAuthService.Instance.OnProfileLoaded += HandlePlayFabProfileLoaded;
+                PlayFab.PlayFabAuthService.Instance.OnRatingUpdated += HandlePlayFabRatingUpdated;
+                if (PlayFab.PlayFabAuthService.Instance.CurrentProfile != null)
+                {
+                    UpdatePlayFabRatingDisplay(PlayFab.PlayFabAuthService.Instance.CurrentProfile);
+                }
+            }
+
+            if (PlayFab.PlayFabMatchmakingClient.HasInstance)
+            {
+                PlayFab.PlayFabMatchmakingClient.Instance.OnTicketUpdated += HandleTicketUpdated;
+            }
+
+            if (Elo.EloManager.Instance != null)
+            {
+                Elo.EloManager.Instance.OnProfileLoaded += HandleProfileLoaded;
+                Elo.EloManager.Instance.OnRatingUpdated += HandleRatingUpdated;
+                if (!PlayFab.PlayFabAuthService.HasInstance || PlayFab.PlayFabAuthService.Instance.CurrentProfile == null)
+                {
+                    UpdateRatingDisplay(Elo.EloManager.Instance.CurrentProfile);
+                }
+            }
         }
 
         private void UnsubscribeManagerEvents()
         {
             if (!_isSubscribed) return;
-            if (MatchmakingManager.Instance != null)
+            if (MatchmakingManager.HasInstance)
             {
                 MatchmakingManager.Instance.OnStateChanged -= HandleStateChanged;
                 MatchmakingManager.Instance.OnStatusMessageChanged -= HandleStatusMessageChanged;
                 MatchmakingManager.Instance.OnRoomCreated -= HandleRoomCreated;
             }
+
+            if (PlayFab.PlayFabAuthService.HasInstance)
+            {
+                PlayFab.PlayFabAuthService.Instance.OnProfileLoaded -= HandlePlayFabProfileLoaded;
+                PlayFab.PlayFabAuthService.Instance.OnRatingUpdated -= HandlePlayFabRatingUpdated;
+            }
+
+            if (PlayFab.PlayFabMatchmakingClient.HasInstance)
+            {
+                PlayFab.PlayFabMatchmakingClient.Instance.OnTicketUpdated -= HandleTicketUpdated;
+            }
+
+            if (Elo.EloManager.Instance != null)
+            {
+                Elo.EloManager.Instance.OnProfileLoaded -= HandleProfileLoaded;
+                Elo.EloManager.Instance.OnRatingUpdated -= HandleRatingUpdated;
+            }
             _isSubscribed = false;
+        }
+
+        private void HandlePlayFabProfileLoaded(PlayFab.PlayFabPlayerProfile profile)
+        {
+            UpdatePlayFabRatingDisplay(profile);
+        }
+
+        private void HandlePlayFabRatingUpdated(int oldRating, int newRating, int delta)
+        {
+            if (PlayFab.PlayFabAuthService.HasInstance)
+            {
+                UpdatePlayFabRatingDisplay(PlayFab.PlayFabAuthService.Instance.CurrentProfile);
+            }
+        }
+
+        private void HandleTicketUpdated(PlayFab.MatchmakingTicketDto ticket)
+        {
+            if (ticket != null && playerRatingBadgeText != null)
+            {
+                playerRatingBadgeText.text = $"YOUR NAME: {ticket.displayName} · YOUR RATING: {ticket.rating} ELO · PLAYERS IN QUEUE: {ticket.playersInQueue}";
+            }
+        }
+
+        public void UpdatePlayFabRatingDisplay(PlayFab.PlayFabPlayerProfile profile, int queueCount = 1)
+        {
+            if (playerRatingBadgeText != null && profile != null)
+            {
+                playerRatingBadgeText.text = $"YOUR NAME: {profile.displayName} · YOUR RATING: {profile.rating} ELO · PLAYERS IN QUEUE: {queueCount}";
+                playerRatingBadgeText.gameObject.SetActive(true);
+            }
+        }
+
+        private void HandleProfileLoaded(Elo.PlayerEloProfile profile)
+        {
+            UpdateRatingDisplay(profile);
+        }
+
+        private void HandleRatingUpdated(int oldRating, int newRating, int delta)
+        {
+            if (Elo.EloManager.Instance != null)
+            {
+                UpdateRatingDisplay(Elo.EloManager.Instance.CurrentProfile);
+            }
+        }
+
+        public void UpdateRatingDisplay(Elo.PlayerEloProfile profile)
+        {
+            if (playerRatingBadgeText != null && profile != null)
+            {
+                playerRatingBadgeText.text = $"YOUR RATING: {profile.rating:N0} ELO · {profile.wins}W - {profile.losses}L";
+                playerRatingBadgeText.gameObject.SetActive(true);
+            }
         }
 
         private void Update()
@@ -114,6 +276,25 @@ namespace Clashura.Multiplayer
             if (loadingIndicator != null && loadingIndicator.activeSelf && loadingSpinnerIcon != null)
             {
                 loadingSpinnerIcon.transform.Rotate(0f, 0f, -spinnerSpeed * Time.deltaTime);
+            }
+
+            if (_isCountdownActive)
+            {
+                _searchDurationRemaining -= Time.deltaTime;
+                if (_searchDurationRemaining <= 0f)
+                {
+                    _searchDurationRemaining = 0f;
+                    _isCountdownActive = false;
+                }
+
+                int minutes = (int)(_searchDurationRemaining / 60f);
+                int seconds = (int)(_searchDurationRemaining % 60f);
+                string timeStr = $"{minutes:D2}:{seconds:D2}";
+
+                if (subtitleText != null && MatchmakingManager.EntryMode == MatchmakingEntryMode.RandomMatch)
+                {
+                    subtitleText.text = $"SEARCHING FOR OPPONENT · TIME: {timeStr}";
+                }
             }
         }
 
@@ -136,6 +317,9 @@ namespace Clashura.Multiplayer
 
             if (cancelButton != null) cancelButton.onClick.AddListener(OnCancelClicked);
             if (backToMenuButton != null) backToMenuButton.onClick.AddListener(OnBackToMenuClicked);
+
+            if (cancelConfirmYesButton != null) cancelConfirmYesButton.onClick.AddListener(OnCancelConfirmYesClicked);
+            if (cancelConfirmNoButton != null) cancelConfirmNoButton.onClick.AddListener(OnCancelConfirmNoClicked);
         }
 
         private void UnhookButtons()
@@ -151,6 +335,9 @@ namespace Clashura.Multiplayer
 
             if (cancelButton != null) cancelButton.onClick.RemoveListener(OnCancelClicked);
             if (backToMenuButton != null) backToMenuButton.onClick.RemoveListener(OnBackToMenuClicked);
+
+            if (cancelConfirmYesButton != null) cancelConfirmYesButton.onClick.RemoveListener(OnCancelConfirmYesClicked);
+            if (cancelConfirmNoButton != null) cancelConfirmNoButton.onClick.RemoveListener(OnCancelConfirmNoClicked);
         }
 
         #region Navigation & Panel Switching
@@ -160,6 +347,7 @@ namespace Clashura.Multiplayer
         /// </summary>
         public void ShowModeSelection()
         {
+            ShowCancelConfirmation(false);
             if (versusMatchupUI != null) versusMatchupUI.HideMatchup();
             if (matchmakingCard != null) matchmakingCard.SetActive(true);
             if (backToMenuButton != null) backToMenuButton.gameObject.SetActive(true);
@@ -184,6 +372,67 @@ namespace Clashura.Multiplayer
             }
             SetStatus("Choose an option to create or search for a 1v1 battle arena.", new Color(0.85f, 0.90f, 0.98f));
             SetButtonsInteractable(true);
+
+            if (PlayFab.PlayFabAuthService.HasInstance && PlayFab.PlayFabAuthService.Instance.CurrentProfile != null)
+            {
+                UpdatePlayFabRatingDisplay(PlayFab.PlayFabAuthService.Instance.CurrentProfile);
+            }
+            else if (Elo.EloManager.Instance != null && Elo.EloManager.Instance.CurrentProfile != null)
+            {
+                UpdateRatingDisplay(Elo.EloManager.Instance.CurrentProfile);
+            }
+        }
+
+        /// <summary>
+        /// Launches direct Skill-Based ELO Matchmaking for the Main Menu "Random Match" button.
+        /// Bypasses the room creation selection and searches dynamically (±50 -> ±100 -> ±150 ELO).
+        /// </summary>
+        public void StartRandomEloMatchmaking()
+        {
+            ShowCancelConfirmation(false);
+            if (versusMatchupUI != null) versusMatchupUI.HideMatchup();
+            if (matchmakingCard != null) matchmakingCard.SetActive(true);
+            if (backToMenuButton != null) backToMenuButton.gameObject.SetActive(true);
+
+            if (modeSelectPanel != null) modeSelectPanel.SetActive(false);
+            if (createRoomPanel != null) createRoomPanel.SetActive(false);
+            if (searchRoomPanel != null) searchRoomPanel.SetActive(false);
+
+            if (cancelButton != null)
+            {
+                cancelButton.gameObject.SetActive(true);
+                var btnTxt = cancelButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (btnTxt != null) btnTxt.text = "CANCEL SEARCH";
+            }
+            if (roomNameText != null) roomNameText.gameObject.SetActive(false);
+
+            if (titleText != null)
+            {
+                titleText.gameObject.SetActive(true);
+                titleText.text = "RANDOM MATCH";
+            }
+            if (subtitleText != null)
+            {
+                subtitleText.gameObject.SetActive(true);
+                subtitleText.text = "SKILL-BASED ELO MATCHMAKING";
+            }
+
+            if (PlayFab.PlayFabAuthService.HasInstance && PlayFab.PlayFabAuthService.Instance.CurrentProfile != null)
+            {
+                UpdatePlayFabRatingDisplay(PlayFab.PlayFabAuthService.Instance.CurrentProfile);
+            }
+            else if (Elo.EloManager.Instance != null && Elo.EloManager.Instance.CurrentProfile != null)
+            {
+                UpdateRatingDisplay(Elo.EloManager.Instance.CurrentProfile);
+            }
+
+            SetStatus("Connecting to matchmaking queue...", new Color(1.0f, 0.85f, 0.30f));
+            ShowLoading(true);
+
+            if (MatchmakingManager.Instance != null)
+            {
+                MatchmakingManager.Instance.StartEloSkillMatchmaking();
+            }
         }
 
         /// <summary>
@@ -240,12 +489,23 @@ namespace Clashura.Multiplayer
 
         private void OnBackToMenuClicked()
         {
+            // If in active Random Match search, prompt with confirmation dialog first
+            if (MatchmakingManager.EntryMode == MatchmakingEntryMode.RandomMatch && cancelConfirmationPanel != null && _isCountdownActive)
+            {
+                ShowCancelConfirmation(true);
+                return;
+            }
+
             if (MatchmakingManager.Instance != null && MatchmakingManager.Instance.IsBusy)
             {
                 MatchmakingManager.Instance.CancelMatchmaking();
             }
 
-            SceneManager.LoadScene(mainMenuSceneName);
+            _isCountdownActive = false;
+            if (Application.isPlaying)
+            {
+                SceneManager.LoadScene(mainMenuSceneName);
+            }
         }
 
         #endregion
@@ -286,23 +546,71 @@ namespace Clashura.Multiplayer
 
         private void OnCancelClicked()
         {
+            // If cancel confirmation modal is configured, show it to confirm departure
+            if (cancelConfirmationPanel != null)
+            {
+                ShowCancelConfirmation(true);
+                return;
+            }
+
+            ExecuteCancelMatchmaking();
+        }
+
+        public void ShowCancelConfirmation(bool show)
+        {
+            if (cancelConfirmationPanel != null)
+            {
+                cancelConfirmationPanel.SetActive(show);
+                if (show)
+                {
+                    cancelConfirmationPanel.transform.SetAsLastSibling();
+                }
+            }
+        }
+
+        public void OnCancelConfirmYesClicked()
+        {
+            Debug.Log("[MatchmakingUI] User confirmed cancellation. Withdrawing from matchmaking queue and returning to Main Menu.");
+            ShowCancelConfirmation(false);
+
             if (MatchmakingManager.Instance != null)
             {
                 MatchmakingManager.Instance.CancelMatchmaking();
             }
 
+            _isCountdownActive = false;
+
+            if (Application.isPlaying)
+            {
+                SceneManager.LoadScene(mainMenuSceneName);
+            }
+        }
+
+        public void OnCancelConfirmNoClicked()
+        {
+            Debug.Log("[MatchmakingUI] User dismissed cancel confirmation. Continuing matchmaking search.");
+            ShowCancelConfirmation(false);
+        }
+
+        private void ExecuteCancelMatchmaking()
+        {
+            if (MatchmakingManager.Instance != null)
+            {
+                MatchmakingManager.Instance.CancelMatchmaking();
+            }
+
+            _isCountdownActive = false;
             SetButtonsInteractable(true);
             ShowLoading(false);
             if (cancelButton != null) cancelButton.gameObject.SetActive(false);
             if (roomNameText != null) roomNameText.gameObject.SetActive(false);
 
-            if (createRoomPanel != null && createRoomPanel.activeSelf)
+            if (MatchmakingManager.EntryMode == MatchmakingEntryMode.RandomMatch)
             {
-                SetStatus("Room hosting canceled. Ready to host again or return to mode select.");
-            }
-            else if (searchRoomPanel != null && searchRoomPanel.activeSelf)
-            {
-                SetStatus("Room search canceled. Ready to search again or return to mode select.");
+                if (Application.isPlaying)
+                {
+                    SceneManager.LoadScene(mainMenuSceneName);
+                }
             }
             else
             {
@@ -319,6 +627,7 @@ namespace Clashura.Multiplayer
             switch (state)
             {
                 case MatchmakingState.Idle:
+                    _isCountdownActive = false;
                     SetButtonsInteractable(true);
                     ShowLoading(false);
                     if (cancelButton != null) cancelButton.gameObject.SetActive(false);
@@ -331,7 +640,22 @@ namespace Clashura.Multiplayer
                     SetButtonsInteractable(false);
                     ShowLoading(true);
                     SetStatus(message, new Color(1.0f, 0.85f, 0.30f)); // Gold status
-                    if (cancelButton != null) cancelButton.gameObject.SetActive(true);
+                    if (cancelButton != null)
+                    {
+                        cancelButton.gameObject.SetActive(true);
+                        var btnTxt = cancelButton.GetComponentInChildren<TextMeshProUGUI>();
+                        if (btnTxt != null)
+                        {
+                            btnTxt.text = MatchmakingManager.EntryMode == MatchmakingEntryMode.RandomMatch
+                                ? "CANCEL SEARCH"
+                                : "CANCEL MATCHMAKING";
+                        }
+                    }
+                    if (state == MatchmakingState.SearchingOpponent && !_isCountdownActive)
+                    {
+                        _searchDurationRemaining = PlayFab.PlayFabConfig.MaxSearchDurationSeconds;
+                        _isCountdownActive = true;
+                    }
                     break;
 
                 case MatchmakingState.WaitingForOpponent:
@@ -342,11 +666,17 @@ namespace Clashura.Multiplayer
                     break;
 
                 case MatchmakingState.OpponentFound:
+                    _isCountdownActive = false;
                     ShowLoading(false);
+                    if (subtitleText != null && MatchmakingManager.EntryMode == MatchmakingEntryMode.RandomMatch)
+                    {
+                        subtitleText.text = "OPPONENT FOUND!";
+                    }
                     SetStatus(message, new Color(0.20f, 0.95f, 0.40f)); // Green found
                     break;
 
                 case MatchmakingState.MatchStarting:
+                    _isCountdownActive = false;
                     ShowLoading(false);
                     SetStatus(message, new Color(0.20f, 0.95f, 0.40f)); // Emerald starting
                     if (cancelButton != null) cancelButton.gameObject.SetActive(false);
@@ -355,12 +685,29 @@ namespace Clashura.Multiplayer
                     {
                         var p1 = PhotonFusionManager.Instance != null ? PhotonFusionManager.Instance.GetHostProfile() : PlayerMatchProfile.CreateLocalProfile(true);
                         var p2 = PhotonFusionManager.Instance != null ? PhotonFusionManager.Instance.GetClientProfile() : PlayerMatchProfile.CreateRivalPreviewProfile();
+
+                        var pfTicket = PlayFab.PlayFabMatchmakingClient.HasInstance ? PlayFab.PlayFabMatchmakingClient.Instance.CurrentTicket : null;
+                        if (pfTicket != null && pfTicket.status == "Matched")
+                        {
+                            if (p1 != null)
+                            {
+                                p1.playerName = pfTicket.displayName;
+                                p1.playerPoints = pfTicket.rating;
+                            }
+                            if (p2 != null)
+                            {
+                                p2.playerName = pfTicket.matchedOpponentName;
+                                p2.playerPoints = pfTicket.matchedOpponentRating;
+                            }
+                        }
+
                         string rName = PhotonFusionManager.Instance != null ? PhotonFusionManager.Instance.CurrentSessionName : "Arena";
                         ShowVersusMatchup(p1, p2, rName, null);
                     }
                     break;
 
                 case MatchmakingState.Failed:
+                    _isCountdownActive = false;
                     ShowLoading(false);
                     SetStatus(message, new Color(1.0f, 0.35f, 0.35f)); // Red error
                     SetButtonsInteractable(true);

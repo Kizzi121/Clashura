@@ -31,6 +31,8 @@ namespace Clashura.AI.Career
         [SerializeField] private Button confirmYesButton;
         [SerializeField] private Button confirmNoButton;
 
+        public GameObject ConfirmationPanel => confirmationPanelRoot;
+
         [Header("Status Feedback")]
         [SerializeField] private TextMeshProUGUI statusBannerText;
 
@@ -151,19 +153,42 @@ namespace Clashura.AI.Career
                 return;
             }
 
-            // Continue the saved career
-            bool success = AICareerManager.Instance.ContinueCareer();
-            if (!success)
+            if (AICareerMasterUI.Instance != null)
             {
-                // Fallback to loading AIVersusScreen
-                SceneManager.LoadScene(AICareerManager.SceneAIVersus);
+                bool prepared = AICareerManager.Instance.PrepareContinueCareerData();
+                if (prepared)
+                {
+                    AICareerMasterUI.Instance.ShowVersusScreen();
+                }
+                else
+                {
+                    AICareerMasterUI.Instance.ShowDifficultySelection();
+                }
+            }
+            else
+            {
+                // Standalone scene fallback
+                bool success = AICareerManager.Instance.ContinueCareer();
+                if (!success)
+                {
+                    SceneManager.LoadScene(AICareerManager.SceneAICareerMenu);
+                }
             }
         }
 
         public void OnBackClicked()
         {
             Debug.Log("[AICareerUI] Returning to Main Menu...");
-            SceneManager.LoadScene(AICareerManager.SceneMainMenu);
+            if (Application.isPlaying)
+            {
+                SceneManager.LoadScene(AICareerManager.SceneMainMenu);
+            }
+#if UNITY_EDITOR
+            else
+            {
+                UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Clashura/Scenes/MainMenu/MainMenu.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
+            }
+#endif
         }
 
         public void OnConfirmYesClicked()
@@ -207,8 +232,16 @@ namespace Clashura.AI.Career
 
         private void ProceedToDifficultySelection()
         {
-            Debug.Log("[AICareerUI] Loading Difficulty Selection (BetterWithAI)...");
-            SceneManager.LoadScene(AICareerManager.SceneBetterWithAI);
+            if (AICareerMasterUI.Instance != null)
+            {
+                Debug.Log("[AICareerUI] Transitioning to Difficulty Selection panel...");
+                AICareerMasterUI.Instance.ShowDifficultySelection();
+            }
+            else if (Application.isPlaying)
+            {
+                Debug.Log("[AICareerUI] Loading AI Career Menu scene...");
+                SceneManager.LoadScene(AICareerManager.SceneAICareerMenu);
+            }
         }
     }
 }

@@ -304,8 +304,16 @@ namespace Clashura.AI.Career
 
         public void OnBackClicked()
         {
-            Debug.Log("[AIVSScreenController] Returning to AI Career Menu...");
-            SceneManager.LoadScene(AICareerManager.SceneAICareerMenu);
+            if (AICareerMasterUI.Instance != null)
+            {
+                Debug.Log("[AIVSScreenController] Returning to Difficulty Selection panel...");
+                AICareerMasterUI.Instance.ShowDifficultySelection();
+            }
+            else if (Application.isPlaying)
+            {
+                Debug.Log("[AIVSScreenController] Returning to AI Career Menu scene...");
+                SceneManager.LoadScene(AICareerManager.SceneAICareerMenu);
+            }
         }
 
         public void OnStartMatchClicked()

@@ -41,40 +41,11 @@ namespace Clashura.Utilities
             return _cachedFont;
         }
 
-        [MenuItem("Clashura/AI/Build BetterWithAI Scene")]
+        [MenuItem("Clashura/AI/Build BetterWithAI Scene (Delegated to Unified Scene)")]
         public static void BuildBetterWithAIScene()
         {
-            Debug.Log("[BetterWithAISceneBuilder] Building Premier AAA BetterWithAI Scene...");
-
-            // 1. Ensure all AI art assets exist
-            AIArtGenerator.GenerateAllAIArt();
-
-            string sceneDir = Path.GetDirectoryName(ScenePath);
-            if (!Directory.Exists(sceneDir))
-            {
-                Directory.CreateDirectory(sceneDir);
-            }
-
-            // 2. Create new empty scene
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            // 3. Setup 2D Camera
-            Setup2DCamera();
-
-            // 4. Setup EventSystem
-            SetupEventSystem();
-
-            // 5. Setup Master Canvas & Hierarchy
-            SetupBetterWithAICanvas();
-
-            // 6. Save Scene
-            EditorSceneManager.SaveScene(scene, ScenePath);
-            EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-
-            // 7. Add to Build Settings
-            AddSceneToBuildSettings(ScenePath);
-
-            Debug.Log($"<color=green>[BetterWithAISceneBuilder] Successfully built and registered AAA BetterWithAI scene: {ScenePath}!</color>");
+            Debug.Log("[BetterWithAISceneBuilder] Delegating to Unified AI Career Scene (AICareerMenu.unity)...");
+            AICareerSceneBuilder.BuildUnifiedAICareerScene();
         }
 
         private static void Setup2DCamera()
