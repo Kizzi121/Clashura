@@ -87,16 +87,12 @@ namespace Clashura.AI.Career
         }
 
         /// <summary>
-        /// Starts a completely new AI Career with the specified difficulty:
-        /// 1. Resets old AI career progress.
-        /// 2. Samples exactly 3 random AI characters from the selected difficulty tier.
-        /// 3. Reads player's authentic 3 characters.
-        /// 4. Saves career data persistently.
-        /// 5. Transitions to 3v3 Versus Screen.
+        /// Prepares career data for a fresh start without triggering a scene reload.
+        /// Used by unified multi-panel UI.
         /// </summary>
-        public void StartNewCareerWithDifficulty(AIDifficulty difficulty)
+        public void PrepareNewCareerData(AIDifficulty difficulty)
         {
-            Debug.Log($"[AICareerManager] Starting New AI Career with difficulty: {difficulty}...");
+            Debug.Log($"[AICareerManager] Preparing New AI Career data for difficulty: {difficulty}...");
 
             // 1. Reset old career
             AICareerSaveManager.ClearCareer();
@@ -122,21 +118,14 @@ namespace Clashura.AI.Career
             };
 
             AICareerSaveManager.SaveCareer(activeCareer);
-
-            // Also mirror selected difficulty in existing BetterWithAIState for consistency
             BetterWithAIState.SelectedDifficulty = difficulty;
-
-            // 5. Open Versus Screen
-            LoadAIVersusScreen();
         }
 
         /// <summary>
-        /// Continues the saved AI Career:
-        /// 1. Loads saved difficulty, progress, and character teams.
-        /// 2. If AI team is empty, generates random 3 characters from saved difficulty.
-        /// 3. Transitions to 3v3 Versus Screen without restarting.
+        /// Prepares career data for continue without triggering a scene reload.
+        /// Used by unified multi-panel UI.
         /// </summary>
-        public bool ContinueCareer()
+        public bool PrepareContinueCareerData()
         {
             if (!AICareerSaveManager.HasSavedCareer())
             {
@@ -145,7 +134,7 @@ namespace Clashura.AI.Career
             }
 
             activeCareer = AICareerSaveManager.LoadCareer();
-            Debug.Log($"[AICareerManager] Continuing AI Career: Level {activeCareer.careerLevel}, Difficulty {activeCareer.DifficultyEnum}");
+            Debug.Log($"[AICareerManager] Continuing AI Career data: Level {activeCareer.careerLevel}, Difficulty {activeCareer.DifficultyEnum}");
 
             // Ensure player team is populated
             if (activeCareer.playerCharacterIds == null || activeCareer.playerCharacterIds.Count < 3)
@@ -162,6 +151,33 @@ namespace Clashura.AI.Career
             }
 
             BetterWithAIState.SelectedDifficulty = activeCareer.DifficultyEnum;
+            return true;
+        }
+
+        /// <summary>
+        /// Starts a completely new AI Career with the specified difficulty:
+        /// 1. Resets old AI career progress.
+        /// 2. Samples exactly 3 random AI characters from the selected difficulty tier.
+        /// 3. Reads player's authentic 3 characters.
+        /// 4. Saves career data persistently.
+        /// 5. Transitions to 3v3 Versus Screen.
+        /// </summary>
+        public void StartNewCareerWithDifficulty(AIDifficulty difficulty)
+        {
+            PrepareNewCareerData(difficulty);
+            LoadAIVersusScreen();
+        }
+
+        /// <summary>
+        /// Continues the saved AI Career:
+        /// 1. Loads saved difficulty, progress, and character teams.
+        /// 2. If AI team is empty, generates random 3 characters from saved difficulty.
+        /// 3. Transitions to 3v3 Versus Screen without restarting.
+        /// </summary>
+        public bool ContinueCareer()
+        {
+            bool prepared = PrepareContinueCareerData();
+            if (!prepared) return false;
 
             LoadAIVersusScreen();
             return true;
@@ -171,17 +187,38 @@ namespace Clashura.AI.Career
 
         public void LoadAICareerMenu()
         {
-            SceneManager.LoadScene(SceneAICareerMenu);
+            if (AICareerMasterUI.Instance != null)
+            {
+                AICareerMasterUI.Instance.ShowCareerMenu();
+            }
+            else
+            {
+                SceneManager.LoadScene(SceneAICareerMenu);
+            }
         }
 
         public void LoadDifficultySelection()
         {
-            SceneManager.LoadScene(SceneBetterWithAI);
+            if (AICareerMasterUI.Instance != null)
+            {
+                AICareerMasterUI.Instance.ShowDifficultySelection();
+            }
+            else
+            {
+                SceneManager.LoadScene(SceneAICareerMenu);
+            }
         }
 
         public void LoadAIVersusScreen()
         {
-            SceneManager.LoadScene(SceneAIVersus);
+            if (AICareerMasterUI.Instance != null)
+            {
+                AICareerMasterUI.Instance.ShowVersusScreen();
+            }
+            else
+            {
+                SceneManager.LoadScene(SceneAICareerMenu);
+            }
         }
 
         public void ReturnToMainMenu()

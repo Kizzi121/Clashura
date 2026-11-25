@@ -70,22 +70,14 @@ namespace Clashura.UI.MainMenu
 
         private void HookButtons()
         {
-            // Button 1: PLAYER VS PLAYER is handled by PvPMenuController for 1v1 Photon Fusion 2 matchmaking
-            // We intentionally do NOT attach placeholder feedback here.
+            // Button 1: PLAYER VS PLAYER is handled by PvPMenuController for 1v1 custom rooms
+            // Button 2: RANDOM MATCH is handled by PvPMenuController for Skill-Based ELO Matchmaking
+            // Both buttons perform team selection validation and route to their respective matchmaking flow.
 
             // New Button: PLAY WITH AI (Opens AI Career Menu)
             if (playWithAIButton != null)
             {
                 playWithAIButton.onClick.AddListener(OnPlayWithAIClicked);
-            }
-
-            // Button 2: RANDOM MATCH (Visual only for now)
-            if (randomMatchButton != null)
-            {
-                randomMatchButton.onClick.AddListener(() =>
-                {
-                    ShowFeedback("Random Match: Matchmaking coming soon!");
-                });
             }
 
             // Button 3: CHARACTER SELECTION (Opens Character Selection panel)

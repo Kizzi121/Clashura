@@ -289,10 +289,10 @@ namespace Clashura.Utilities
             vlg.childControlWidth = true;
             vlg.childControlHeight = false;
 
-            // Modular Animated Buttons
+            // Modular Animated Buttons (1: PvP, 2: Random Match, 3: Play with AI, 4: Character Selection, 5: Settings, 6: Exit)
             var btnPvp = CreateModularMenuButton(btnContainer.transform, "Btn_PvP", "PLAYER VS PLAYER", "1v1, 2v2 & More", $"{ArtDir}/Icon_PvP.png", false);
-            var btnAi = CreateModularMenuButton(btnContainer.transform, "Btn_PlayWithAI", "PLAY WITH AI", "Novice, Medium & Hard", $"{AIArtDir}/Icon_PlayWithAI.png", false);
-            var btnRandom = CreateModularMenuButton(btnContainer.transform, "Btn_RandomMatch", "RANDOM MATCH", "Quick Match (Auto-Balanced)", $"{ArtDir}/Icon_RandomMatch.png", false);
+            var btnRandom = CreateModularMenuButton(btnContainer.transform, "Btn_RandomMatch", "RANDOM MATCH", "Quick Match (Auto-Balanced)", $"{ArtDir}/Icon_RandomMatch.png", true);
+            var btnAi = CreateModularMenuButton(btnContainer.transform, "Btn_PlayWithAI", "PLAY WITH AI", "Novice, Medium & Hard", $"{AIArtDir}/Icon_PlayWithAI.png", true);
             var btnCharSelect = CreateModularMenuButton(btnContainer.transform, "Btn_CharacterSelection", "CHARACTER SELECTION", "Choose Your Hero", $"{ArtDir}/Icon_CharSelect.png", true);
             var btnSettings = CreateModularMenuButton(btnContainer.transform, "Btn_Settings", "SETTINGS", "Audio & Controls", $"{ArtDir}/Icon_Settings.png", false);
             var btnExit = CreateModularMenuButton(btnContainer.transform, "Btn_Exit", "EXIT GAME", "Return to Desktop", $"{ArtDir}/Icon_Exit.png", false);
@@ -339,13 +339,13 @@ namespace Clashura.Utilities
             ctrlSO.FindProperty("feedbackText").objectReferenceValue = ttTmp;
             ctrlSO.ApplyModifiedProperties();
 
-            // Build Team Warning Panel for 1v1 PvP
-            BuildTeamWarningPanel(panel.transform, btnPvp.GetComponent<Button>());
+            // Build Team Warning Panel for 1v1 PvP and Random Match ELO Queue
+            BuildTeamWarningPanel(panel.transform, btnPvp.GetComponent<Button>(), btnRandom.GetComponent<Button>());
 
             return panel;
         }
 
-        private static void BuildTeamWarningPanel(Transform parent, Button pvpButton)
+        private static void BuildTeamWarningPanel(Transform parent, Button pvpButton, Button randomButton = null)
         {
             // 1. Modal Scrim (fullscreen blocker)
             GameObject warnObj = new GameObject("TeamWarningPanel", typeof(RectTransform), typeof(Image));
@@ -425,6 +425,10 @@ namespace Clashura.Utilities
             var pvpCtrl = parent.gameObject.AddComponent<PvPMenuController>();
             var pvpSO = new SerializedObject(pvpCtrl);
             pvpSO.FindProperty("pvpButton").objectReferenceValue = pvpButton;
+            if (randomButton != null && pvpSO.FindProperty("randomMatchButton") != null)
+            {
+                pvpSO.FindProperty("randomMatchButton").objectReferenceValue = randomButton;
+            }
             pvpSO.FindProperty("teamWarningPanel").objectReferenceValue = warnObj;
             pvpSO.FindProperty("warningMessageText").objectReferenceValue = warnTmp;
             pvpSO.FindProperty("goToCharacterSelectionButton").objectReferenceValue = goBtn;
@@ -529,7 +533,10 @@ namespace Clashura.Utilities
 
             // Micro-Interaction Animator
             var anim = btnObj.GetComponent<UIButtonAnimator>();
-            anim.EnablePulse = pulse;
+            var animSO = new SerializedObject(anim);
+            animSO.FindProperty("enablePulse").boolValue = pulse;
+            animSO.ApplyModifiedProperties();
+            EditorUtility.SetDirty(anim);
 
             return btn;
         }

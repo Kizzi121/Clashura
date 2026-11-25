@@ -26,6 +26,7 @@ namespace Clashura.Utilities
         public const string MainMenuScenePath = "Assets/Clashura/Scenes/MainMenu/MainMenu.unity";
         private const string ArtDir = "Assets/Clashura/Art/UI/MainMenu";
         private const string MultiplayerArtDir = "Assets/Clashura/Art/UI/Multiplayer";
+        private const string AIArtDir = "Assets/Clashura/Art/AI";
         private const string FontPath = "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset";
 
         private static TMP_FontAsset _cachedFont;
@@ -161,6 +162,9 @@ namespace Clashura.Utilities
             var subTmp = CreateTMPText(titleObj.transform, "Subtitle", "1V1 ONLINE MATCHMAKING · CHOOSE MODE", 20, FontStyles.Normal, new Color(0.72f, 0.85f, 1.0f, 0.95f), 0, 0, 1, 0.40f);
             subTmp.alignment = TextAlignmentOptions.Center;
             subTmp.characterSpacing = 2f;
+
+            var ratingTmp = CreateTMPText(titleObj.transform, "PlayerRatingBadge", "YOUR NAME: Commander · YOUR RATING: 1,250 ELO", 18, FontStyles.Bold, new Color(1.0f, 0.85f, 0.30f), 0, -0.35f, 1, 0.05f);
+            ratingTmp.alignment = TextAlignmentOptions.Center;
 
             // 5. Main Card Container (Center)
             GameObject cardObj = new GameObject("MatchmakingCard", typeof(RectTransform), typeof(Image));
@@ -361,9 +365,20 @@ namespace Clashura.Utilities
             uiSO.FindProperty("statusText").objectReferenceValue = statusTmp;
             uiSO.FindProperty("loadingIndicator").objectReferenceValue = loadingObj;
             uiSO.FindProperty("loadingSpinnerIcon").objectReferenceValue = spImg;
+            if (uiSO.FindProperty("playerRatingBadgeText") != null)
+            {
+                uiSO.FindProperty("playerRatingBadgeText").objectReferenceValue = ratingTmp;
+            }
 
             uiSO.FindProperty("versusMatchupUI").objectReferenceValue = vsUI;
             uiSO.FindProperty("matchmakingCard").objectReferenceValue = cardObj;
+
+            // 7. Cancel Confirmation Modal Panel (Are you sure you want to leave?)
+            var (confRoot, confPromptTmp, confYesBtn, confNoBtn) = CreateCancelConfirmationPanel(canvasObj.transform);
+            uiSO.FindProperty("cancelConfirmationPanel").objectReferenceValue = confRoot;
+            uiSO.FindProperty("cancelConfirmationPromptText").objectReferenceValue = confPromptTmp;
+            uiSO.FindProperty("cancelConfirmYesButton").objectReferenceValue = confYesBtn;
+            uiSO.FindProperty("cancelConfirmNoButton").objectReferenceValue = confNoBtn;
 
             uiSO.FindProperty("mainMenuSceneName").stringValue = "MainMenu";
             uiSO.ApplyModifiedProperties();
@@ -593,6 +608,107 @@ namespace Clashura.Utilities
             bkTxt.alignment = TextAlignmentOptions.Center;
 
             return (actionBtn, backBtn, inputField);
+        }
+
+        private static (GameObject root, TextMeshProUGUI promptTmp, Button yesBtn, Button noBtn) CreateCancelConfirmationPanel(Transform canvasTransform)
+        {
+            var modalRoot = new GameObject("CancelConfirmationPanel", typeof(RectTransform), typeof(Image));
+            modalRoot.transform.SetParent(canvasTransform, false);
+            var mrRect = modalRoot.GetComponent<RectTransform>();
+            mrRect.anchorMin = Vector2.zero;
+            mrRect.anchorMax = Vector2.one;
+            mrRect.sizeDelta = Vector2.zero;
+            var mrImg = modalRoot.GetComponent<Image>();
+            mrImg.color = new Color(0f, 0f, 0f, 0.85f); // Dark translucent barrier
+
+            // Dialog Window (740 x 420 px)
+            var dialogObj = new GameObject("DialogWindow", typeof(RectTransform), typeof(Image));
+            dialogObj.transform.SetParent(modalRoot.transform, false);
+            var dRect = dialogObj.GetComponent<RectTransform>();
+            dRect.anchorMin = new Vector2(0.5f, 0.5f);
+            dRect.anchorMax = new Vector2(0.5f, 0.5f);
+            dRect.pivot = new Vector2(0.5f, 0.5f);
+            dRect.sizeDelta = new Vector2(740, 420);
+            dRect.anchoredPosition = Vector2.zero;
+            var dImg = dialogObj.GetComponent<Image>();
+            dImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{AIArtDir}/UI_Confirmation_Dialog_Frame.png")
+                       ?? AssetDatabase.LoadAssetAtPath<Sprite>($"{MultiplayerArtDir}/UI_Room_Action_Card.png")
+                       ?? AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/UI_Popup_Frame.png");
+            dImg.type = Image.Type.Simple;
+
+            // Warning Crest Icon (Top Center)
+            var warnObj = new GameObject("WarnIcon", typeof(RectTransform), typeof(Image));
+            warnObj.transform.SetParent(dialogObj.transform, false);
+            var wRect = warnObj.GetComponent<RectTransform>();
+            wRect.anchorMin = new Vector2(0.5f, 0.85f);
+            wRect.anchorMax = new Vector2(0.5f, 0.85f);
+            wRect.pivot = new Vector2(0.5f, 0.5f);
+            wRect.sizeDelta = new Vector2(64, 64);
+            wRect.anchoredPosition = Vector2.zero;
+            var wImg = warnObj.GetComponent<Image>();
+            wImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{AIArtDir}/Icon_Badge_Hard.png")
+                       ?? AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtDir}/Icon_Exit.png");
+            wImg.preserveAspect = true;
+
+            // Header Title
+            var hTmp = CreateTMPText(dialogObj.transform, "Header", "LEAVE MATCHMAKING?", 26, FontStyles.Bold, new Color(1.0f, 0.85f, 0.35f), 0.05f, 0.65f, 0.95f, 0.75f);
+            hTmp.alignment = TextAlignmentOptions.Center;
+            hTmp.characterSpacing = 3f;
+
+            // Primary Prompt: "Are you sure you want to leave?"
+            var promptTmp = CreateTMPText(dialogObj.transform, "PromptText", "Are you sure you want to leave?", 22, FontStyles.Bold, Color.white, 0.08f, 0.44f, 0.92f, 0.62f);
+            promptTmp.alignment = TextAlignmentOptions.Center;
+
+            // Explanatory Note
+            var noteTmp = CreateTMPText(dialogObj.transform, "NoteText", "Your search in the global matchmaking queue will be stopped\nand you will return to the Main Menu.", 16, FontStyles.Normal, new Color(0.72f, 0.84f, 0.96f, 0.90f), 0.08f, 0.30f, 0.92f, 0.42f);
+            noteTmp.alignment = TextAlignmentOptions.Center;
+
+            // Buttons Container (Horizontal)
+            var btnContainer = new GameObject("ButtonRow", typeof(RectTransform), typeof(HorizontalLayoutGroup));
+            btnContainer.transform.SetParent(dialogObj.transform, false);
+            var bcRect = btnContainer.GetComponent<RectTransform>();
+            bcRect.anchorMin = new Vector2(0.5f, 0.16f);
+            bcRect.anchorMax = new Vector2(0.5f, 0.16f);
+            bcRect.pivot = new Vector2(0.5f, 0.5f);
+            bcRect.sizeDelta = new Vector2(620, 64);
+            bcRect.anchoredPosition = Vector2.zero;
+
+            var hlg = btnContainer.GetComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 30;
+            hlg.childAlignment = TextAnchor.MiddleCenter;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = false;
+
+            // YES Button (Cancel queue & Return to Main Menu)
+            var yesBtnObj = new GameObject("Btn_CancelConfirm_Yes", typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement), typeof(UIButtonAnimator));
+            yesBtnObj.transform.SetParent(btnContainer.transform, false);
+            var yle = yesBtnObj.GetComponent<LayoutElement>();
+            yle.preferredWidth = 280;
+            yle.preferredHeight = 56;
+            var yImg = yesBtnObj.GetComponent<Image>();
+            yImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{AIArtDir}/UI_Button_Confirm_Yes.png")
+                       ?? AssetDatabase.LoadAssetAtPath<Sprite>($"{MultiplayerArtDir}/UI_Button_Gold_Action.png");
+            yImg.type = Image.Type.Simple;
+            var yTxt = CreateTMPText(yesBtnObj.transform, "Label", "YES, LEAVE", 16, FontStyles.Bold, Color.white, 0f, 0f, 1f, 1f);
+            yTxt.alignment = TextAlignmentOptions.Center;
+            var yesBtn = yesBtnObj.GetComponent<Button>();
+
+            // NO Button (Dismiss modal & Continue queue search)
+            var noBtnObj = new GameObject("Btn_CancelConfirm_No", typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement), typeof(UIButtonAnimator));
+            noBtnObj.transform.SetParent(btnContainer.transform, false);
+            var nle = noBtnObj.GetComponent<LayoutElement>();
+            nle.preferredWidth = 280;
+            nle.preferredHeight = 56;
+            var nImg = noBtnObj.GetComponent<Image>();
+            nImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{AIArtDir}/UI_Button_Confirm_No.png")
+                       ?? AssetDatabase.LoadAssetAtPath<Sprite>($"{MultiplayerArtDir}/UI_Button_Cyan_Action.png");
+            nImg.type = Image.Type.Simple;
+            var nTxt = CreateTMPText(noBtnObj.transform, "Label", "NO, STAY", 16, FontStyles.Bold, Color.white, 0f, 0f, 1f, 1f);
+            nTxt.alignment = TextAlignmentOptions.Center;
+            var noBtn = noBtnObj.GetComponent<Button>();
+
+            modalRoot.SetActive(false); // Inactive by default
+            return (modalRoot, promptTmp, yesBtn, noBtn);
         }
 
         private static TextMeshProUGUI CreateTMPText(Transform parent, string name, string text, float fontSize, FontStyles style, Color color, float minX, float minY, float maxX, float maxY)
@@ -1023,7 +1139,8 @@ namespace Clashura.Utilities
                 new EditorBuildSettingsScene("Assets/Clashura/Scenes/MainMenu/MainMenu.unity", true),
                 new EditorBuildSettingsScene("Assets/Clashura/Scenes/CharacterSelection/CharacterSelection.unity", true),
                 new EditorBuildSettingsScene(MatchmakingScenePath, true),
-                new EditorBuildSettingsScene("Assets/Scenes/SampleScene.unity", true)
+                new EditorBuildSettingsScene("Assets/Scenes/SampleScene.unity", true),
+                new EditorBuildSettingsScene("Assets/Clashura/Scenes/BetterWithAI/AICareerMenu.unity", true)
             };
             EditorBuildSettings.scenes = scenes.ToArray();
             AssetDatabase.SaveAssets();
